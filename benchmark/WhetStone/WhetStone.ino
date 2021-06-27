@@ -48,8 +48,13 @@
  *          r.painter@ieee.org
  */
 
-#include "esp_task_wdt.h"
-#define WDT_TIMEOUT 9
+#define ESP32
+// #define ESP8266
+
+#ifdef ESP32
+  #include "esp_task_wdt.h"
+  #define WDT_TIMEOUT 9
+#endif
 
 void setup() {
   Serial.begin(115200);
@@ -59,7 +64,9 @@ void setup() {
     delay(1000);
   }
   Serial.println("Whetstone Benchmark, Version 1.2 (Language: C)");
-  esp_task_wdt_init(WDT_TIMEOUT, 0);
+  #ifdef ESP32
+    esp_task_wdt_init(WDT_TIMEOUT, 0);
+  #endif // ESP32
 }
 
 
@@ -160,6 +167,9 @@ whetstone(int argc)
     int continuous;
 
     loopstart = 1000;       /* see the note about LOOP below */
+    #ifdef ESP8266
+      loopstart = 256;
+    #endif
     continuous = 0;
 
     II = 1;

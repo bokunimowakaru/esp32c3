@@ -1,5 +1,11 @@
-#include "esp_task_wdt.h"
-#define WDT_TIMEOUT 9
+// #define ESP32
+#define ESP8266
+
+#ifdef ESP32
+  #include "esp_task_wdt.h"
+  #define WDT_TIMEOUT 9
+#endif
+
 #define LED_BUILTIN 2
 
 void setup() 
@@ -13,7 +19,10 @@ void setup()
   Serial.println("*              Arduino Benchmark                  *");
   Serial.println("***************************************************");
   Serial.println("");
-  esp_task_wdt_init(WDT_TIMEOUT, 0);
+
+  #ifdef ESP32
+    esp_task_wdt_init(WDT_TIMEOUT, 0);
+  #endif // ESP32
 }
 
 void benchmark_digitalWrite(uint32_t count)

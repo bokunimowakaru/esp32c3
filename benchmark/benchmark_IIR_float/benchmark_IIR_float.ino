@@ -6,8 +6,13 @@
 // a[0]*y[n] + a[1]*y[n-1] + â€¦ + a[n]*y[0] = b[0]*x[n] + b[1]*x[m-1] + â€¦ + b[m]*x[0]
 //
 
-#include "esp_task_wdt.h"
-#define WDT_TIMEOUT 9
+#define ESP32
+// #define ESP8266
+
+#ifdef ESP32
+  #include "esp_task_wdt.h"
+  #define WDT_TIMEOUT 9
+#endif
 
 const float a[5] = {1, -3.91745514489661, 5.75755576410991, -3.76266550602334, 0.922565876650813};
 const float b[5] = {0.000780326282260527, 0, -0.00156065256452105, 0, 0.000780326282260527};
@@ -35,7 +40,9 @@ void filt()
 void setup()
 {
   Serial.begin(115200);
-  esp_task_wdt_init(WDT_TIMEOUT, 0);
+  #ifdef ESP32
+    esp_task_wdt_init(WDT_TIMEOUT, 0);
+  #endif // ESP32
 }
 
 void loop()
@@ -49,6 +56,10 @@ void loop()
 
   Serial.println("4th order float IIR speed benchmark");
   Serial.println("===================================");
+
+  #ifdef ESP8266
+    numberOfTries = 1024;
+  #endif
 
   startTime = millis();
   for (n = 0; n < numberOfTries; n++)
