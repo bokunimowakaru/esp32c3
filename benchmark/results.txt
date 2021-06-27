@@ -1,0 +1,31 @@
+Whetstone Benchmark, Version 1.2 (Language: C)
+
+	ESP32
+	Loops: 1000, Iterations: 1, Duration: 309 ms.
+	C Converted Single Precision Whetstones: 323.62 MIPS	
+	ESP32C3:
+	Loops: 1000, Iterations: 1, Duration: 8651 ms.
+	C Converted Single Precision Whetstones: 11.56 MIPS
+
+benchmark_IIR_float
+4th order float IIR speed benchmark
+
+	ESP32:
+	total number of samples: 614400  duration [ms]: 144
+	  ==> speed [MegaSamples/second] : 4.267	ESP32C3:
+	total number of samples: 614400  duration [ms]: 7527
+	  ==> speed [MegaSamples/second] : 0.082
+
+benchmark_peripheral
+
+	ESP32:
+	number of tries: 1048576  duration [ms]: 133
+	  ==> digitalWrite speed [megaSamples/second] : 7.88
+	number of tries: 2048  duration [ms]: 129
+	  ==> analogRead speed [kiloSamples/second] : 15.88
+	ESP32C3:
+	number of tries: 1048576  duration [ms]: 367
+	  ==> digitalWrite speed [megaSamples/second] : 2.86
+	number of tries: 2048  duration [ms]: 99
+	  ==> analogRead speed [kiloSamples/second] : 20.69	
+
