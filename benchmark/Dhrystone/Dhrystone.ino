@@ -149,10 +149,10 @@ void setup() {
     Number_Of_Runs = 2000000;
     Serial.println("mode = ESP32");
   #elif ESP8266
-    Number_Of_Runs = 2000000;
+    Number_Of_Runs = 500000;
     Serial.println("mode = ESP8266");
   #else
-    Number_Of_Runs = 2000000;
+    Number_Of_Runs = 300000;
     Serial.println("mode = Arduino");
   #endif
   
@@ -281,12 +281,9 @@ void setup() {
     Serial.println("Please increase number of runs");
     Serial.println();
   }
-  else
-  {
-    Microseconds = (double) User_Time / (double) Number_Of_Runs;
-    Dhrystones_Per_Second = (double) Number_Of_Runs / ((double)User_Time/1000000.0);
-    Vax_Mips = Dhrystones_Per_Second / 1757.0;
-  }
+  Microseconds = (double) User_Time / (double) Number_Of_Runs;
+  Dhrystones_Per_Second = (double) Number_Of_Runs / ((double)User_Time/1000000.0);
+  Vax_Mips = Dhrystones_Per_Second / 1757.0;
 /*
 #ifdef ROPT
     printf ("Register option selected?  YES\r\n");
