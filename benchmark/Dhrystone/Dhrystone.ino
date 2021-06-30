@@ -220,7 +220,7 @@ void setup() {
   User_Time = End_Time - Begin_Time;
 
   Serial.print("Execution ends : ");
-  Serial.println(User_Time / 1000, 3);
+  Serial.print((float)User_Time / 1000., 3);
   Serial.println("Seconds");
 /*
   printf ("\r\n");
