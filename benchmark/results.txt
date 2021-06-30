@@ -15,6 +15,12 @@ Whetstone Benchmark, Version 1.2 (Language: C)
 
 Dhrystone Benchmark, Version 2.1 (Language: C)
 
+	ESP32:
+	Execution ends : 4.538 Seconds
+	Microseconds for one run through Dhrystone: 2.27
+	Dhrystones per Second: 440698.12
+	VAX MIPS rating = 250.82 DMIPS
+
 	ESP32C3:
 	Execution ends : 6.605 Seconds
 	Microseconds for one run through Dhrystone: 3.30
