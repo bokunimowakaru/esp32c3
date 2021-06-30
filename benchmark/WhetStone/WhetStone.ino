@@ -65,7 +65,7 @@ modified parts from followings are licensed under the MIT License.
  *          r.painter@ieee.org
  */
 
-#define ESP32
+// #define ESP32
 // #define ESP8266
 
 #ifdef ESP32
