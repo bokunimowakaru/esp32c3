@@ -1,3 +1,20 @@
+/***********************************************************************
+## ArduinoBenchmarkAllPlatforms
+### WhetStone  
+
+2021/06.27に下記からダウンロードしたファイルを元に、ESP32-C3、ESP32、
+ESP8266用に改変しました。  
+https://github.com/ChrisMicro/ArduinoBenchmarkAllPlatforms.git  
+
+元ソースからの改変部の権利は、国野 亘 に帰属し、MITライセンスとします。  
+
+Copyright (c) 2021 Wataru KUNINO
+https://bokunimo.net/
+
+WhetStone.ino,
+modified parts from followings are licensed under the MIT License.
+************************************************************************/
+
 /*  Arduino-compatible Whetstone benchmark.
  *  Based on the work of Thomas Kirchner, modified to work
  *  with the Arduino IDE 1.6.x series.

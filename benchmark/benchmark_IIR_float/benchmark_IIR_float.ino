@@ -1,12 +1,28 @@
+/***********************************************************************
+## ArduinoBenchmarkAllPlatforms
+### benchmark_IIR_float  
+
+2021/06.27に下記からダウンロードしたファイルを元に、ESP32-C3、ESP32、
+ESP8266用に改変しました。  
+https://github.com/ChrisMicro/ArduinoBenchmarkAllPlatforms.git  
+
+元ソースからの改変部の権利は、国野 亘 に帰属し、MITライセンスとします。  
+
+Copyright (c) 2021 Wataru KUNINO
+https://bokunimo.net/
+
+benchmark_IIR_float.ino,
+modified parts from followings are licensed under the MIT License.
+************************************************************************/
 
 // https://gist.github.com/nikolaypavlov/f4832cba720917b16905
 //
 // Fourth order bandpass IIR filter coefficients (100 Hz - 500 Hz, sampling rate 22050 Hz)
 //
-// a[0]*y[n] + a[1]*y[n-1] + â€¦ + a[n]*y[0] = b[0]*x[n] + b[1]*x[m-1] + â€¦ + b[m]*x[0]
+// a[0]*y[n] + a[1]*y[n-1] + … + a[n]*y[0] = b[0]*x[n] + b[1]*x[m-1] + … + b[m]*x[0]
 //
 
-#define ESP32
+// #define ESP32
 // #define ESP8266
 
 #ifdef ESP32

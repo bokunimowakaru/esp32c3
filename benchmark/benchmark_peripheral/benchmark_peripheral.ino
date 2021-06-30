@@ -1,5 +1,22 @@
+/***********************************************************************
+## ArduinoBenchmarkAllPlatforms
+### benchmark_peripheral  
+
+2021/06.27に下記からダウンロードしたファイルを元に、ESP32-C3、ESP32、
+ESP8266用に改変しました。  
+https://github.com/ChrisMicro/ArduinoBenchmarkAllPlatforms.git  
+
+元ソースからの改変部の権利は、国野 亘 に帰属し、MITライセンスとします。  
+
+Copyright (c) 2021 Wataru KUNINO
+https://bokunimo.net/
+
+benchmark_peripheral.ino,
+modified parts from followings are licensed under the MIT License.
+************************************************************************/
+
 // #define ESP32
-#define ESP8266
+// #define ESP8266
 
 #ifdef ESP32
   #include "esp_task_wdt.h"
