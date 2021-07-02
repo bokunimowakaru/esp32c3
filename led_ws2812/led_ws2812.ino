@@ -12,14 +12,20 @@ https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
 /*
 #define T0H_ns (220+380)/2
 #define T0L_ns (580+1000)/2
+#define T1H_ns (580+1000)/2
+#define T1L_ns (580+1000)/2
 */
 
 // SK68XXMINI-HS
 #define T0H_ns 320
-#define T0L_ns 640
+#define T0L_ns 900
+#define T1H_ns 640
+#define T1L_ns 580
 
 int T0H_num = 3;
 int T0L_num = 9;
+int T1H_num = 9;
+int T1L_num = 9;
 
 byte ledp[][3]={{10,10,10},{20,5,5},{5,20,5},{5,5,20}};
 
@@ -45,19 +51,22 @@ void _led_reset(){
 
 void _led_code(int code){
     volatile int TH = T0H_num, TL = T0L_num;
-    if(code) TH = T0L_num;
-    noInterrupts();
+    if(code){
+        TH = T1H_num;
+        TL = T1L_num;
+    }
     digitalWrite(PIN_LED,HIGH);
     while(TH>0) TH--;
     digitalWrite(PIN_LED,LOW);
     while(TL>0) TL--;
-    interrupts();
 }
 
 void led(int r,int g,int b){
     _led_reset();
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
+    noInterrupts();
     for(int b=23;b >= 0; b--) _led_code(rgb & (1<<b));
+    interrupts();
 }
 
 void setup() {                  // 起動時に一度だけ実行される関数
@@ -66,8 +75,12 @@ void setup() {                  // 起動時に一度だけ実行される関数
     pinMode(PIN_LED,OUTPUT);    // LEDを接続したポートを出力に設定する
     T0H_num=_led_delay(T0H_ns);
     T0L_num=_led_delay(T0L_ns);
+    T1H_num=_led_delay(T1H_ns);
+    T1L_num=_led_delay(T1L_ns);
     Serial.printf("T0H %dns -> %d, ",T0H_ns,T0H_num);
     Serial.printf("T0L %dns -> %d\n",T0L_ns,T0L_num);
+    Serial.printf("T1H %dns -> %d, ",T1H_ns,T1H_num);
+    Serial.printf("T1L %dns -> %d\n",T1L_ns,T1L_num);
     led(0,0,0);
 }
 
