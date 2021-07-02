@@ -19,10 +19,10 @@ https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
 #endif
 
 #ifdef SK68XXMINI
-    #define T0H_ns 320
-    #define T0L_ns 800
-    #define T1H_ns 640
-    #define T1L_ns 320
+    #define T0H_ns 320 -200
+    #define T0L_ns 1200 -320 -200
+    #define T1H_ns 640 -200
+    #define T1L_ns 1200 -640 -200
 #endif
 
 int T0H_num = 3;
@@ -77,6 +77,7 @@ void setup() {                  // 起動時に一度だけ実行される関数
     Serial.begin(115200);
     Serial.println("RGB LED WS2812");
     pinMode(PIN_LED,OUTPUT);    // LEDを接続したポートを出力に設定する
+    digitalWrite(PIN_LED,HIGH);
     T0H_num=_led_delay(T0H_ns);
     T0L_num=_led_delay(T0L_ns);
     T1H_num=_led_delay(T1H_ns);
