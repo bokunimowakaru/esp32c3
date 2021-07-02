@@ -9,18 +9,21 @@ http://www.world-semi.com/
 https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
 */
 #define PIN_LED 8              // IO 8 にLEDを接続する
-/*
-#define T0H_ns (220+380)/2
-#define T0L_ns (580+1000)/2
-#define T1H_ns (580+1000)/2
-#define T1L_ns (580+1000)/2
-*/
+#define SK68XXMINI
 
-// SK68XXMINI-HS
-#define T0H_ns 320
-#define T0L_ns 900
-#define T1H_ns 640
-#define T1L_ns 580
+#ifdef WS2812
+    #define T0H_ns (220+380)/2
+    #define T0L_ns (580+1000)/2
+    #define T1H_ns (580+1000)/2
+    #define T1L_ns (580+1000)/2
+#endif
+
+#ifdef SK68XXMINI
+    #define T0H_ns 320
+    #define T0L_ns 800
+    #define T1H_ns 640
+    #define T1L_ns 320
+#endif
 
 int T0H_num = 3;
 int T0L_num = 9;
@@ -49,23 +52,24 @@ void _led_reset(){
     delayMicroseconds(300);     // 280us以上
 }
 
-void _led_code(int code){
-    volatile int TH = T0H_num, TL = T0L_num;
-    if(code){
-        TH = T1H_num;
-        TL = T1L_num;
-    }
-    digitalWrite(PIN_LED,HIGH);
-    while(TH>0) TH--;
-    digitalWrite(PIN_LED,LOW);
-    while(TL>0) TL--;
-}
-
 void led(int r,int g,int b){
     _led_reset();
+    volatile int TH, TL;
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
     noInterrupts();
-    for(int b=23;b >= 0; b--) _led_code(rgb & (1<<b));
+    for(int b=23;b >= 0; b--){
+        if(rgb & (1<<b)){
+            TH = T1H_num;
+            TL = T1L_num;
+        }else{
+            TH = T0H_num;
+            TL = T0L_num;
+        }
+        digitalWrite(PIN_LED,HIGH);
+        while(TH>0) TH--;
+        digitalWrite(PIN_LED,LOW);
+        while(TL>0) TL--;
+    }
     interrupts();
 }
 
