@@ -9,26 +9,34 @@ http://www.world-semi.com/
 https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
 */
 #define PIN_LED 8              // IO 8 にLEDを接続する
-#define SK68XXMINI
+#define ESP32C3
 
+#ifdef ESP32C3
+    #define T_Delay 360
+    #define T0H_ns 320 -T_Delay
+    #define T0L_ns 1200 -320 -T_Delay
+    #define T1H_ns 640 -T_Delay
+    #define T1L_ns 1200 -640 -T_Delay
+#endif
 #ifdef WS2812
-    #define T0H_ns (220+380)/2
-    #define T0L_ns (580+1000)/2
-    #define T1H_ns (580+1000)/2
-    #define T1L_ns (580+1000)/2
+    #define T_Delay 190
+    #define T0H_ns (220+380)/2 -T_Delay
+    #define T0L_ns (580+1000)/2 -T_Delay
+    #define T1H_ns (580+1000)/2 -T_Delay
+    #define T1L_ns (580+1000)/2 -T_Delay
 #endif
-
 #ifdef SK68XXMINI
-    #define T0H_ns 320 -200
-    #define T0L_ns 1200 -320 -200
-    #define T1H_ns 640 -200
-    #define T1L_ns 1200 -640 -200
+    #define T_Delay 190
+    #define T0H_ns 320 -T_Delay
+    #define T0L_ns 1200 -320 -T_Delay
+    #define T1H_ns 640 -T_Delay
+    #define T1L_ns 1200 -640 -T_Delay
 #endif
 
-int T0H_num = 3;
-int T0L_num = 9;
-int T1H_num = 9;
-int T1L_num = 9;
+int T0H_num = 1;
+int T0L_num = 7;
+int T1H_num = 7;
+int T1L_num = 7;
 
 byte ledp[][3]={{10,10,10},{20,5,5},{5,20,5},{5,5,20}};
 
@@ -40,7 +48,7 @@ int _led_delay(int ns){
     delay(1);
     do{
         i = ++counts;
-        target = micros() + (uint32_t)ns / 10;
+        target = micros() + ns / 10;
         while(i>0) i--;
     }while(micros() < target);
     interrupts();
@@ -82,10 +90,10 @@ void setup() {                  // 起動時に一度だけ実行される関数
     T0L_num=_led_delay(T0L_ns);
     T1H_num=_led_delay(T1H_ns);
     T1L_num=_led_delay(T1L_ns);
-    Serial.printf("T0H %dns -> %d, ",T0H_ns,T0H_num);
-    Serial.printf("T0L %dns -> %d\n",T0L_ns,T0L_num);
-    Serial.printf("T1H %dns -> %d, ",T1H_ns,T1H_num);
-    Serial.printf("T1L %dns -> %d\n",T1L_ns,T1L_num);
+    Serial.printf("T0H %dns -> %d, ",T0H_ns+T_Delay,T0H_num);
+    Serial.printf("T0L %dns -> %d\n",T0L_ns+T_Delay,T0L_num);
+    Serial.printf("T1H %dns -> %d, ",T1H_ns+T_Delay,T1H_num);
+    Serial.printf("T1L %dns -> %d\n",T1L_ns+T_Delay,T1L_num);
     led(0,0,0);
 }
 
