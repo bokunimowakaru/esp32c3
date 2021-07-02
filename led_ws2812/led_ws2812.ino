@@ -8,16 +8,23 @@ WS2812B Ver. No.: V5, Intelligent control LED, integrated light source
 http://www.world-semi.com/
 https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
 */
-#define PIN_LED 32              // IO 8 にLEDを接続する
+#define PIN_LED 8              // IO 8 にLEDを接続する
+/*
 #define T0H_ns (220+380)/2
 #define T0L_ns (580+1000)/2
+*/
+
+// SK68XXMINI-HS
+#define T0H_ns 320
+#define T0L_ns 640
+
 int T0H_num = 3;
 int T0L_num = 9;
 
 byte ledp[][3]={{10,10,10},{20,5,5},{5,20,5},{5,5,20}};
 
 int _led_delay(int ns){
-    volatile int i;
+    volatile uint32_t i;
     uint32_t target, counts=0;
     delay(1000);
     noInterrupts();
@@ -28,7 +35,7 @@ int _led_delay(int ns){
         while(i>0) i--;
     }while(micros() < target);
     interrupts();
-    return counts/100;
+    return (counts + 50)/100;
 }
 
 void _led_reset(){
