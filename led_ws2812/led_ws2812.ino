@@ -33,10 +33,10 @@ https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
     #define T1L_ns 1200 -640 -T_Delay
 #endif
 
-int T0H_num = 1;
-int T0L_num = 7;
-int T1H_num = 7;
-int T1L_num = 7;
+int T0H_num = 0;
+int T0L_num = 8;
+int T1H_num = 4;
+int T1L_num = 3;
 
 byte ledp[][3]={{10,10,10},{20,5,5},{5,20,5},{5,5,20}};
 
