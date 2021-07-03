@@ -6,7 +6,7 @@ led03_color RGB LED WS2812
 
 
 void tone2rgb(byte rgb[], int tone, int brightness){
-    float r, g, b, s, v, f, q, t;
+    float r, g, b, v, f, q, t;
     v = (float)brightness / 255.;
     f = ((float)(tone % 60)) / 60.;
     t = f * v;
