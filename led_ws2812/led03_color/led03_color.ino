@@ -18,7 +18,7 @@ void tone2rgb(byte rgb[], int tone, int brightness){
         case 3: r=0; g=q; b=v; break;
         case 4: r=t; g=0; b=v; break;
         case 5: r=v; g=0; b=q; break;
-        default: r=v; g=0; b=q; break;
+        default: r=v; g=t; b=0; break;
     }
     rgb[0] = (byte)(r * 255. + .5);
     rgb[1] = (byte)(g * 255. + .5);
