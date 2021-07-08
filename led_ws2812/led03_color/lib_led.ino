@@ -3,13 +3,12 @@ LED制御ドライバ RGB LED WS2812
                                         Copyright (c) 2021 Wataru KUNINO
 ***********************************************************************/
 #define PIN_LED 8                               // IO 8 にLEDを接続する
-#define T_Delay 360                             // LED処理による遅延(ns)
 #define T0H_ns 320                              // b0信号Hレベル時間(ns)
 #define T0L_ns 1200 -320                        // b0信号Lレベル時間(ns)
 #define T1H_ns 640                              // b1信号Hレベル時間(ns)
 #define T1L_ns 1200 -640                        // b1信号Lレベル時間(ns)
 
-int T0H_num,T0L_num,T1H_num,T1L_num;            // 待ち時間カウンタ値
+int T_Delay,T0H_num,T0L_num,T1H_num,T1L_num;    // 待ち時間カウンタ値
 
 /* 引数nsに代入された待ち時間(ns)に対応する待ち時間処理回数を求める */
 int _led_delay(int ns){                         // カウンタ設定処理部
@@ -24,6 +23,29 @@ int _led_delay(int ns){                         // カウンタ設定処理部
     }while(micros() < target);                  // 目標未達成時に繰返し
     interrupts();                               // 割り込みの許可
     return (counts + 50)/100;                   // 繰り返し回数を応答
+}
+
+/* 信号操作に必要な処理時間を算出する。戻り値は必要時間(ns) */
+int _initial_delay(){                           // 初期ディレイ測定部
+    volatile uint32_t i=0;                      // 繰り返し処理用変数i
+    uint32_t start, t, counts;                  // 開始時刻,試行繰返し数
+    noInterrupts();                             // 割り込みの禁止
+    start = micros();                           // 開始時刻の保持
+    counts = 0;                                 // カウンタのリセット
+    do{                                         // 繰り返し処理の開始
+        counts++;                               // カウント
+    }while(counts < 1000);                      // 目標未達成時に繰返し
+    t = micros() - start;                       // 経過時間をtに代入
+    start = micros();                           // 開始時刻の保持
+    counts = 0;                                 // カウンタのリセット
+    do{                                         // 繰り返し処理の開始
+        counts++;                               // カウント
+        digitalWrite(PIN_LED,HIGH);             // (被測定対象)GPIO制御
+        while(i>0);                             // (被測定対象)while
+    }while(counts < 1000);                      // 目標未達成時に繰返し
+    t = micros() - start - t;                   // 対象処理に要した時間
+    interrupts();                               // 割り込みの許可
+    return t;                                   // 繰り返し回数を応答
 }
 
 /* 引数r,g,bに代入された色をLEDに送信する。値は0～255の範囲で設定 */
@@ -56,6 +78,7 @@ void led(int brightness){
 
 void led_setup(){
     pinMode(PIN_LED,OUTPUT);                    // ポートを出力に設定
+    T_Delay = _initial_delay();                 // 信号処理遅延を算出
     T0H_num=_led_delay(T0H_ns);                 // 待ち時間処理回数変換
     T0L_num=_led_delay(T0L_ns);
     T1H_num=_led_delay(T1H_ns);
