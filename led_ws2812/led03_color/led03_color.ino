@@ -35,7 +35,7 @@ int tone = 0;                                   // 現在の色調(0〜359)
 int tone_speed = +1;                            // 色調の変更速度
 int brightness = 0;                             // 現在の輝度値
 int dimmer_speed = +1;                          // 輝度の変更速度
-int dimmer_max = 15;                            // 点灯時の輝度(255以下)
+int dimmer_max = 14;                            // 点灯時の輝度(255以下)
 void loop() {                                   // 繰り返し実行する関数
     byte rgb[3];
     tone2rgb(rgb, tone, brightness);
