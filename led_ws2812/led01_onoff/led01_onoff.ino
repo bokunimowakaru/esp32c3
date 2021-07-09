@@ -26,6 +26,7 @@ int _led_delay(int ns){                         // カウンタ設定処理部
     return (counts + 50)/100;                   // 繰り返し回数を応答
 }
 
+/* 信号操作に必要な処理時間を算出する。戻り値は必要時間(ns) */
 int _initial_delay(){                           // 初期ディレイ測定部
     volatile uint32_t i=0;                      // 繰り返し処理用変数i
     uint32_t start, t, counts;                  // 開始時刻,試行繰返し数
