@@ -1,5 +1,6 @@
 /***********************************************************************
 LED制御ドライバ RGB LED WS2812
+解説＝ https://bokunimo.net/blog/esp/1522/
                                         Copyright (c) 2021 Wataru KUNINO
 ***********************************************************************/
 #define PIN_LED 8                               // IO 8 にLEDを接続する
@@ -71,14 +72,14 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
     interrupts();                               // 割り込みの許可
 }
 
-void led(int brightness){
-    if(brightness > 0xff) brightness = 0xff;
-    led(brightness,brightness,brightness);
+void led(int brightness){                       // グレースケール制御
+    if(brightness > 0xff) brightness = 0xff;    // 256以上時に255に設定
+    led(brightness,brightness,brightness);      // RGB全て同値でLED制御
 }
 
 void led_off(){                                 // LED制御の停止
-    led(0);
-    digitalWrite(PIN_LED,LOW);                  // Lレベル
+    led(0);                                     // LEDの消灯
+    digitalWrite(PIN_LED,LOW);                  // リセット(Lレベル)
     delayMicroseconds(300);                     // 280us以上を維持
 }
 
