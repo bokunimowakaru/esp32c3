@@ -76,6 +76,12 @@ void led(int brightness){
     led(brightness,brightness,brightness);
 }
 
+void led_off(){                                 // LED制御の停止
+    led(0);
+    digitalWrite(PIN_LED,LOW);                  // Lレベル
+    delayMicroseconds(300);                     // 280us以上を維持
+}
+
 void led_setup(){
     pinMode(PIN_LED,OUTPUT);                    // ポートを出力に設定
     T_Delay = _initial_delay();                 // 信号処理遅延を算出

@@ -12,7 +12,7 @@ int T_Delay,T0H_num,T0L_num,T1H_num,T1L_num;    // 待ち時間カウンタ値
 
 /* 引数nsに代入された待ち時間(ns)に対応する待ち時間処理回数を求める */
 int _led_delay(int ns){                         // カウンタ設定処理部
-    volatile uint32_t i;                        // 繰り返し処理用変数t
+    volatile uint32_t i;                        // 繰り返し処理用変数i
     uint32_t target, counts=0;                  // 目標時刻,試行繰返し数
     ns -= T_Delay;                              // 処理遅延分を減算
     noInterrupts();                             // 割り込みの禁止
