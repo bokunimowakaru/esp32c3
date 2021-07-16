@@ -84,8 +84,29 @@ void setup() {
   #ifdef ESP32
     esp_task_wdt_init(WDT_TIMEOUT, 0);
   #endif // ESP32
+  Serial.println("--------\nno Interrupts");
+  delay(100);
+  delay(1);
+  noInterrupts();
+  delay(1);
+  whetstone(0);
+  interrupts();
+  Serial.println("--------\nenabled Interrupts");
+  delay(100);
+  delay(1);
+  whetstone(0);
+  delay(100);
 }
 
+void loop() {
+  Serial.println("--------\non the loop function");
+  delay(100);
+  delay(1);
+  whetstone(0);
+  delay(1);
+}
+
+/////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -474,11 +495,5 @@ C--------------------------------------------------------------------
         goto LCONT;
 
     return(0);
-}
-
-
-void loop() {
-  whetstone(0);
-  delay(1);
 }
 
