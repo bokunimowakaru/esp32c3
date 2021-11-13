@@ -61,14 +61,14 @@ void TimerWakeUp_setSleepTime(int time_sec){
   " Seconds");
 }
 
-void TimerWakeUp_setExternalInput(gpio_num_t gpio, int level){
+void TimerWakeUp_setExternalInput(int pin, int level){
   /* @param mask  bit mask of GPIO numbers which will cause wakeup. Only GPIOs
    *              which are have RTC functionality can be used in this bit map:
-   *              0,2,4,12-15,25-27,32-39.
+   *              0,2,4,12-15,25-27,32-39. <-- for ESP32 // C3は要確認
   */
 //if(ESP.getChipRevision() == 0 )return;  // for Revision 0
-//  esp_sleep_enable_ext0_wakeup(gpio,level); // ESP32-C3未サポート
-  Serial.println("Wakeup ESP32 when IO" + String(gpio) + " = " + String(level));
+  esp_deep_sleep_enable_gpio_wakeup(1ULL << pin,(esp_deepsleep_gpio_wake_up_mode_t)level);
+  Serial.println("Wakeup ESP32 when IO" + String(pin) + " = " + String(level));
 }
 
 int TimerWakeUp_bootCount(){
@@ -76,7 +76,10 @@ int TimerWakeUp_bootCount(){
 }
 
 byte TimerWakeUp_init(){
+  // esp_sleep_config_gpio_isolate();
+  // esp_sleep_enable_gpio_switch(false);
   ++bootCount;	//Increment boot number and print it every reboot
+  Serial.println();
   Serial.println("Boot number: " + String(bootCount));
   return TimerWakeUp_print_wakeup_reason();  //Print the wakeup reason for ESP32
 }
