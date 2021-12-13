@@ -7,26 +7,25 @@ led_ws2812 RGB LED WS2812
 WS2812B Ver. No.: V5, Intelligent control LED, integrated light source
 http://www.world-semi.com/
 https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
+https://www.rose-lighting.com/wp-content/uploads/sites/53/2020/05/SK68XX-MINI-HS-REV.04-EN23535RGB-thick.pdf
 */
 #define PIN_LED 8              // IO 8 にLEDを接続する
 #define ESP32C3
 
+#define T_DELAY 360
 #ifdef ESP32C3
-    #define T_DELAY 360
-    #define T0H_ns 320
-    #define T0L_ns 1200 -320
-    #define T1H_ns 640
-    #define T1L_ns 1200 -640
+    #define T0H_ns (320+400)/2
+    #define T0L_ns 1250 - T0H_ns
+    #define T1H_ns (640+1000)/2
+    #define T1L_ns 1250 - T1H_ns
 #endif
 #ifdef WS2812
-    #define T_DELAY 190
     #define T0H_ns (220+380)/2
     #define T0L_ns (580+1000)/2
     #define T1H_ns (580+1000)/2
     #define T1L_ns (580+1000)/2
 #endif
 #ifdef SK68XXMINI
-    #define T_DELAY 190
     #define T0H_ns 320
     #define T0L_ns 1200 -320
     #define T1H_ns 640
@@ -41,52 +40,84 @@ int T1L_num = 3;
 
 byte ledp[][3]={{10,10,10},{20,5,5},{5,20,5},{5,5,20}};
 
-int _led_delay(int ns){
+int _led_delay(uint32_t ns){                    // ns -> num 変換用
     volatile uint32_t i;
-    uint32_t target, counts=0;
-    ns -= T_Delay;                              // 処理遅延分を減算
-    delay(1000);
+    uint32_t start, end, t0, t1, counts, num;
+
+    delay(100);
     noInterrupts();
+    i = 100;                                    // 空ループの測定回数
+    delay(1);
+    start = micros();                           // 開始時刻の保持
+    while(i>0) i--;                             // 100回の空ループ
+    end = micros();                             // 終了時刻の保持
+    t0 = (end - start) * 10;                    // 空ループの処理時間
+    interrupts();
+    Serial.printf("target=%d ns, t0=%d ns, ", ns, t0);
+    if(ns > T_Delay + t0){                      // 減算可能なとき
+        ns -= T_Delay + t0;                     // IO制御遅延を減算
+    }else{                                      // 可能でないとき
+        ns =0;                                  // 0にする
+    }
+
+    delay(100);
+    noInterrupts();
+    counts = 0;
     delay(1);
     do{
         i = ++counts;
-        target = micros() + ns / 10;
+        start = micros();
         while(i>0) i--;
-    }while(micros() < target);
+        end = micros();
+    }while(end < start + ns /10);
     interrupts();
-    return (counts + 50)/100;
+    t1 = (end - start) * 10;
+    num = (counts + 50) / 100;
+    Serial.printf("t1=%d ns, t2=%d ns, num=%d\n", t1, T_Delay + t0 + t1, num);
+    return num;
+
 }
 
-int _initial_delay(){                           // 初期ディレイ測定部
+int _initial_delay(){                           // IO制御ディレイ測定部
     volatile uint32_t i=0;                      // 繰り返し処理用変数i
-    uint32_t start, t, counts;                  // 開始時刻,試行繰返し数
+    uint32_t start, end, t, counts;             // 開始時刻,試行繰返し数
+
+    delay(100);
     noInterrupts();                             // 割り込みの禁止
-    start = micros();                           // 開始時刻の保持
     counts = 0;                                 // カウンタのリセット
+    delay(1);
+    start = micros();                           // 開始時刻の保持
     do{                                         // 繰り返し処理の開始
         counts++;                               // カウント
-    }while(counts < 1000);                      // 目標未達成時に繰返し
-    t = micros() - start;                       // 経過時間をtに代入
-    start = micros();                           // 開始時刻の保持
+    }while(counts < 100);                       // 目標未達成時に繰返し
+    end = micros();                             // 終了時刻の保持
+    interrupts();
+    t = end - start;                            // 経過時間をtに代入
+
+    delay(100);
+    noInterrupts();
     counts = 0;                                 // カウンタのリセット
+    delay(1);
+    start = micros();                           // 開始時刻の保持
     do{                                         // 繰り返し処理の開始
         counts++;                               // カウント
         digitalWrite(PIN_LED,HIGH);             // (被測定対象)GPIO制御
-        while(i>0);                             // (被測定対象)while
-    }while(counts < 1000);                      // 目標未達成時に繰返し
-    t = micros() - start - t;                   // 対象処理に要した時間
+        while(i>0) i=0;                         // (被測定対象)while
+    }while(counts < 100);                       // 目標未達成時に繰返し
+    end = micros();                             // 終了時刻の保持
+    t = end - start - t;                        // 経過時間をtに代入
     interrupts();                               // 割り込みの許可
-    return t;                                   // 繰り返し回数を応答
+    return t * 10;                              // 繰り返し回数を応答
 }
 
 void _led_reset(){
     digitalWrite(PIN_LED,LOW);
-    delayMicroseconds(300);     // 280us以上
+    delayMicroseconds(300);                     // 280us以上
 }
 
 void led(int r,int g,int b){
     _led_reset();
-    volatile int TH, TL;
+    volatile uint32_t TH, TL;
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
     noInterrupts();
     for(int b=23;b >= 0; b--){
@@ -97,10 +128,16 @@ void led(int r,int g,int b){
             TH = T0H_num;
             TL = T0L_num;
         }
-        digitalWrite(PIN_LED,HIGH);
-        while(TH>0) TH--;
-        digitalWrite(PIN_LED,LOW);
-        while(TL>0) TL--;
+        if(TH){
+            digitalWrite(PIN_LED,HIGH);
+            while(TH>0) TH--;
+            digitalWrite(PIN_LED,LOW);
+            while(TL>0) TL--;
+        }else{
+            digitalWrite(PIN_LED,HIGH);
+            digitalWrite(PIN_LED,LOW);
+            while(TL>0) TL--;
+        }
     }
     interrupts();
 }
