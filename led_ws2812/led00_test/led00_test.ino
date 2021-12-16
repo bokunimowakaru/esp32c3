@@ -29,10 +29,10 @@ https://www.rose-lighting.com/wp-content/uploads/sites/53/2020/05/SK68XX-MINI-HS
     #define T1L_ns (580+1000)/2
 #endif
 #ifdef SK68XXMINI
-    #define T0H_ns 320
-    #define T0L_ns 1200 -320
-    #define T1H_ns 640
-    #define T1L_ns 1200 -640
+    #define T0H_ns 320                          // b0信号Hレベル時間(ns)
+    #define T0L_ns 1200 -320                    // b0信号Lレベル時間(ns)
+    #define T1H_ns 640                          // b1信号Hレベル時間(ns)
+    #define T1L_ns 1200 -640                    // b1信号Lレベル時間(ns)
 #endif
 
 int T_Delay = T_DELAY;
@@ -43,6 +43,7 @@ int T1L_num = 3;
 
 byte ledp[][3]={{10,10,10},{20,5,5},{5,20,5},{5,5,20}};
 
+/* 引数nsに代入された待ち時間(ns)に対応する待ち時間処理回数を求める */
 int _led_delay(uint32_t ns){                    // ns -> num 変換用
     volatile uint32_t i;
     uint32_t start, end, t0, t1, counts, num;
@@ -81,6 +82,7 @@ int _led_delay(uint32_t ns){                    // ns -> num 変換用
 
 }
 
+/* 信号操作に必要な処理時間を算出する。戻り値は必要時間(ns) */
 int _initial_delay(){                           // IO制御ディレイ測定部
     volatile uint32_t i=0;                      // 繰り返し処理用変数i
     uint32_t start, end, t, counts;             // 開始時刻,試行繰返し数
@@ -118,33 +120,36 @@ void _led_reset(){
     delayMicroseconds(300);                     // 280us以上
 }
 
+/* 引数r,g,bに代入された色をLEDに送信する。値は0～255の範囲で設定 */
 void led(int r,int g,int b){
     _led_reset();
-    volatile uint32_t TH, TL;
+    volatile uint32_t TH, TL;                   // H/Lレベル時間保持用
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
-    noInterrupts();
-    for(int b=23;b >= 0; b--){
-        if(rgb & (1<<b)){
-            TH = T1H_num;
-            TL = T1L_num;
-        }else{
-            TH = T0H_num;
-            TL = T0L_num;
+    noInterrupts();                             // 割り込みの禁止
+    for(int b=23;b >= 0; b--){                  // 全24ビット分の処理
+        if(rgb & (1<<b)){                       // 対象ビットが1のとき
+            TH = T1H_num;                       // Hレベルの待ち時間設定
+            TL = T1L_num;                       // Hレベルの待ち時間設定
+        }else{                                  // 対象ビットが0のとき
+            TH = T0H_num;                       // Lレベルの待ち時間設定
+            TL = T0L_num;                       // Lレベルの待ち時間設定
         }
         if(TH){
-            digitalWrite(PIN_LED,HIGH);
-            while(TH>0) TH--;
-            digitalWrite(PIN_LED,LOW);
-            while(TL>0) TL--;
+            digitalWrite(PIN_LED,HIGH);         // Hレベルを出力
+            while(TH>0) TH--;                   // 待ち時間処理
+            digitalWrite(PIN_LED,LOW);          // Lレベルを出力
+            while(TL>0) TL--;                   // 待ち時間処理
         }else{
-            digitalWrite(PIN_LED,HIGH);
-            digitalWrite(PIN_LED,LOW);
-            while(TL>0) TL--;
+            digitalWrite(PIN_LED,HIGH);         // Hレベルを出力
+            digitalWrite(PIN_LED,LOW);          // Lレベルを出力
+            while(TL>0) TL--;                   // 待ち時間処理
         }
+
     }
     interrupts();
 }
 
+/* 初期化処理 */
 void setup() {                  // 起動時に一度だけ実行される関数
     Serial.begin(115200);
     Serial.println("RGB LED WS2812");
@@ -163,6 +168,7 @@ void setup() {                  // 起動時に一度だけ実行される関数
     led(0,0,0);
 }
 
+/* LEDの点滅処理 */
 void loop() {                   // setup実行後に繰り返し実行される関数
     for(int i=0;i<sizeof(ledp)/sizeof(ledp[0]);i++){
         Serial.printf("p%d={%d,%d,%d}\n",i,ledp[i][0],ledp[i][1],ledp[i][2]);

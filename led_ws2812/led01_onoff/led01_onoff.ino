@@ -3,7 +3,10 @@ led01_onoff.ino RGB LED WS2812
 フルカラーLED を ON / OFF
                                         Copyright (c) 2021 Wataru KUNINO
 ***********************************************************************/
-#define PIN_LED 8                               // IO 8 にLEDを接続する
+
+#define PIN_LED 2                   // GPIO 2 に WS2812 を接続(m5stamp用)
+// #define PIN_LED 8                // GPIO 8 に WS2812 を接続(DevKitM用)
+
 #define T0H_ns 320                              // b0信号Hレベル時間(ns)
 #define T0L_ns 1200 -320                        // b0信号Lレベル時間(ns)
 #define T1H_ns 640                              // b1信号Hレベル時間(ns)
@@ -64,10 +67,16 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
             TH = T0H_num;                       // Lレベルの待ち時間設定
             TL = T0L_num;                       // Lレベルの待ち時間設定
         }
-        digitalWrite(PIN_LED,HIGH);             // Hレベルを出力
-        while(TH>0) TH--;                       // 待ち時間処理
-        digitalWrite(PIN_LED,LOW);              // Lレベルを出力
-        while(TL>0) TL--;                       // 待ち時間処理
+        if(TH){
+            digitalWrite(PIN_LED,HIGH);         // Hレベルを出力
+            while(TH>0) TH--;                   // 待ち時間処理
+            digitalWrite(PIN_LED,LOW);          // Lレベルを出力
+            while(TL>0) TL--;                   // 待ち時間処理
+        }else{
+            digitalWrite(PIN_LED,HIGH);         // Hレベルを出力
+            digitalWrite(PIN_LED,LOW);          // Lレベルを出力
+            while(TL>0) TL--;                   // 待ち時間処理
+        }
     }
     interrupts();                               // 割り込みの許可
 }

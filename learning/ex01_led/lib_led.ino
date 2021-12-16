@@ -83,6 +83,12 @@ void led(int brightness){                       // グレースケール制御
     led(brightness,brightness,brightness);      // RGB全て同値でLED制御
 }
 
+void led_off(){                                 // LED制御の停止
+    led(0);                                     // LEDの消灯
+    digitalWrite(_PIN_LED,LOW);                 // リセット(Lレベル)
+    delayMicroseconds(300);                     // 280us以上を維持
+}
+
 void led_setup(int pin){
     _PIN_LED = pin;
     pinMode(_PIN_LED,OUTPUT);                   // ポートを出力に設定

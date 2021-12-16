@@ -3,12 +3,12 @@ LED制御ドライバ RGB LED WS2812
 解説＝ https://bokunimo.net/blog/esp/1522/
                                         Copyright (c) 2021 Wataru KUNINO
 ***********************************************************************/
-#define PIN_LED 8                               // IO 8 にLEDを接続する
 #define T0H_ns 320                              // b0信号Hレベル時間(ns)
 #define T0L_ns 1200 -320                        // b0信号Lレベル時間(ns)
 #define T1H_ns 640                              // b1信号Hレベル時間(ns)
 #define T1L_ns 1200 -640                        // b1信号Lレベル時間(ns)
 
+int _PIN_LED = 8;
 int T_Delay,T0H_num,T0L_num,T1H_num,T1L_num;    // 待ち時間カウンタ値
 
 /* 引数nsに代入された待ち時間(ns)に対応する待ち時間処理回数を求める */
@@ -41,7 +41,7 @@ int _initial_delay(){                           // 初期ディレイ測定部
     counts = 0;                                 // カウンタのリセット
     do{                                         // 繰り返し処理の開始
         counts++;                               // カウント
-        digitalWrite(PIN_LED,HIGH);             // (被測定対象)GPIO制御
+        digitalWrite(_PIN_LED,HIGH);            // (被測定対象)GPIO制御
         while(i>0);                             // (被測定対象)while
     }while(counts < 1000);                      // 目標未達成時に繰返し
     t = micros() - start - t;                   // 対象処理に要した時間
@@ -51,7 +51,7 @@ int _initial_delay(){                           // 初期ディレイ測定部
 
 /* 引数r,g,bに代入された色をLEDに送信する。値は0～255の範囲で設定 */
 void led(int r,int g,int b){                    // LEDにカラーを設定
-    digitalWrite(PIN_LED,LOW);                  // Lレベル
+    digitalWrite(_PIN_LED,LOW);                 // Lレベル
     delayMicroseconds(300);                     // 280us以上を維持
     volatile int TH, TL;                        // H/Lレベル時間保持用
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
@@ -64,10 +64,16 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
             TH = T0H_num;                       // Lレベルの待ち時間設定
             TL = T0L_num;                       // Lレベルの待ち時間設定
         }
-        digitalWrite(PIN_LED,HIGH);             // Hレベルを出力
-        while(TH>0) TH--;                       // 待ち時間処理
-        digitalWrite(PIN_LED,LOW);              // Lレベルを出力
-        while(TL>0) TL--;                       // 待ち時間処理
+        if(TH){
+            digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
+            while(TH>0) TH--;                   // 待ち時間処理
+            digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
+            while(TL>0) TL--;                   // 待ち時間処理
+        }else{
+            digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
+            digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
+            while(TL>0) TL--;                   // 待ち時間処理
+        }
     }
     interrupts();                               // 割り込みの許可
 }
@@ -77,11 +83,23 @@ void led(int brightness){                       // グレースケール制御
     led(brightness,brightness,brightness);      // RGB全て同値でLED制御
 }
 
-void led_setup(){
-    pinMode(PIN_LED,OUTPUT);                    // ポートを出力に設定
+void led_off(){                                 // LED制御の停止
+    led(0);                                     // LEDの消灯
+    digitalWrite(_PIN_LED,LOW);                 // リセット(Lレベル)
+    delayMicroseconds(300);                     // 280us以上を維持
+}
+
+void led_setup(int pin){
+    _PIN_LED = pin;
+    pinMode(_PIN_LED,OUTPUT);                   // ポートを出力に設定
+    delay(100);
     T_Delay = _initial_delay();                 // 信号処理遅延を算出
     T0H_num=_led_delay(T0H_ns);                 // 待ち時間処理回数変換
     T0L_num=_led_delay(T0L_ns);
     T1H_num=_led_delay(T1H_ns);
     T1L_num=_led_delay(T1L_ns);
+}
+
+void led_setup(){
+    led_setup(_PIN_LED);
 }

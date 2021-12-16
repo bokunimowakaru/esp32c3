@@ -5,6 +5,8 @@ ESP32-C3 乾電池での動作に必要な Deep Sleep の実験用サンプル�
                                                Copyright (c) 2021 Wataru KUNINO
 *******************************************************************************/
 #include "esp_sleep.h"                      // ESP32用Deep Sleep ライブラリ
+#define PIN_LED 2                           // GPIO 2 に WS2812 を接続(m5stamp用)
+// #define PIN_LED 8                        // GPIO 8 に WS2812 を接続(DevKitM用)
 #define PIN_SW 9                            // スリープ実行ボタン
 #define PIN_SW_HOLDING 3                    // スリープ実行用ボタン押下時間(3秒)
 #define PIN_WAKE 4                          // スリープ解除ボタン
@@ -15,7 +17,7 @@ void setup(){                               // 起動時に一度だけ実行す
     TimerWakeUp_init();                     // 起動理由の表示
     Serial.println("ESP32: Hello!");        // 「ESP32 Hello」をシリアル出力表示
     pinMode(PIN_SW,INPUT_PULLUP);           // ボタン入力の設定
-    led_setup();
+    led_setup(PIN_LED);
     Serial.println("Hold PIN_SW("+String(PIN_SW)+") to sleep");
 }
 

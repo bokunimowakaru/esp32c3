@@ -4,10 +4,12 @@ led02_dimmer RGB LED WS2812
                                         Copyright (c) 2021 Wataru KUNINO
 ***********************************************************************/
 
+#define PIN_LED 2                   // GPIO 2 に WS2812 を接続(m5stamp用)
+// #define PIN_LED 8                // GPIO 8 に WS2812 を接続(DevKitM用)
 
 /* 初期化処理 */
 void setup() {                                  // 一度だけ実行する関数
-    led_setup();                                // LEDドライバの初期化
+    led_setup(PIN_LED);                         // LED接続ポートを出力に
 }
 
 /* LEDの制御 */
