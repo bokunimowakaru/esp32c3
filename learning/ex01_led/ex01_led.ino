@@ -7,7 +7,8 @@ HTTPによるWebサーバ機能搭載 Wi-Fiコンシェルジェがキャンド�
 
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
 #include <WebServer.h>
-#define PIN_LED 8                           // GPIO 8にWS2812 LEDを接続
+#define PIN_LED 2                           // GPIO 2 に WS2812 を接続(m5stamp用)
+// #define PIN_LED 8                        // GPIO 8 に WS2812 を接続(DevKitM用)
 #define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
 #define PASS "password"                     // パスワード
 
@@ -39,9 +40,8 @@ void setup(){                               // 起動時に一度だけ実行す
     WiFi.begin(SSID,PASS);                  // 無線LANアクセスポイントへ接続
     morse(20,50,"HELLO");                   // モールス信号(輝度20,速度50,HELLO)
     while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
-        Serial.print('.');                  // 進捗表示
-        digitalWrite(PIN_LED,!digitalRead(PIN_LED));    // LEDの点滅
-        delay(500);                         // 待ち時間処理
+        led((millis()/50) % 10);            // LEDの点滅
+        delay(50);                          // 待ち時間処理
     }
     morseIp0(10,50,WiFi.localIP());         // IPアドレス終値をモールス信号出力
     server.on("/", handleRoot);             // HTTP接続時のコールバック先を設定

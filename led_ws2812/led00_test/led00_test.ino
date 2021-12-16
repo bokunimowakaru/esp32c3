@@ -9,7 +9,10 @@ http://www.world-semi.com/
 https://akizukidenshi.com/download/ds/worldsemi/WS2812B_20200225.pdf
 https://www.rose-lighting.com/wp-content/uploads/sites/53/2020/05/SK68XX-MINI-HS-REV.04-EN23535RGB-thick.pdf
 */
-#define PIN_LED 8              // IO 8 にLEDを接続する
+
+#define PIN_LED 2                   // GPIO 2 に WS2812 を接続(m5stamp用)
+// #define PIN_LED 8                // GPIO 8 に WS2812 を接続(DevKitM用)
+
 #define ESP32C3
 
 #define T_DELAY 360
