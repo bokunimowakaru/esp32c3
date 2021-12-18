@@ -52,7 +52,7 @@ void setup(){                               // 起動時に一度だけ実行す
 
 void loop(){
     WiFiUDP udp;                            // UDP通信用のインスタンスを定義
-    
+
     udp.beginPacket(SENDTO, PORT);          // UDP送信先を設定
     udp.print(DEVICE);                      // デバイス名を送信
     udp.print(reed);                        // 起動直後のスイッチ状態を送信
