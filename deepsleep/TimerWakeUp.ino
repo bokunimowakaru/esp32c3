@@ -36,18 +36,42 @@ byte TimerWakeUp_print_wakeup_reason(){
 
   wakeup_reason = esp_sleep_get_wakeup_cause();
 
-  switch(wakeup_reason)
-  {
-    case 1  : Serial.print("Wakeup caused by external signal using RTC_IO "); break;
-    case 2  : Serial.print("Wakeup caused by external signal using RTC_CNTL "); break;
-    case 3  : Serial.print("Wakeup caused by timer "); break;
-    case 4  : // Serial.print("Wakeup caused by touchpad "); break;
-              Serial.print("Wakeup caused by timer "); break;
-    case 5  : Serial.print("Wakeup caused by ULP program "); break;
+  /*
+  switch((int)wakeup_reason){
+    case 1  : Serial.print("Not a wakeup cause "); break;
+    case 2  : Serial.print("Wakeup caused by external signal using RTC_IO "); break;
+    case 3  : Serial.print("Wakeup caused by external signal using RTC_CNTL "); break;
+    case 4  : Serial.print("Wakeup caused by timer "); break;
+    case 5  : Serial.print("Wakeup caused by touchpad "); break;
+    case 6  : Serial.print("Wakeup caused by ULP program "); break;
+    case 7  : Serial.print("Wakeup caused by GPIO "); break;
+    case 8  : Serial.print("Wakeup caused by UART "); break;
+    case 9  : Serial.print("Wakeup caused by WIFI "); break;
+    case 10 : Serial.print("Wakeup caused by COCPU int "); break;
+    case 11 : Serial.print("Wakeup caused by COCPU crash "); break;
+    case 12 : Serial.print("Wakeup caused by BT "); break;
     default : Serial.print("Wakeup was not caused by deep sleep "); break;
+    */
+
+  switch(wakeup_reason){
+    case ESP_SLEEP_WAKEUP_ALL  		: Serial.print("Not a wakeup cause "); break;
+    case ESP_SLEEP_WAKEUP_EXT0 		: Serial.print("Wakeup caused by external signal using RTC_IO "); break;
+    case ESP_SLEEP_WAKEUP_EXT1 		: Serial.print("Wakeup caused by external signal using RTC_CNTL "); break;
+    case ESP_SLEEP_WAKEUP_TIMER		: Serial.print("Wakeup caused by timer "); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD	: Serial.print("Wakeup caused by touchpad "); break;
+    case ESP_SLEEP_WAKEUP_ULP		: Serial.print("Wakeup caused by ULP program "); break;
+    case ESP_SLEEP_WAKEUP_GPIO		: Serial.print("Wakeup caused by GPIO "); break;
+    case ESP_SLEEP_WAKEUP_UART		: Serial.print("Wakeup caused by UART "); break;
+    case ESP_SLEEP_WAKEUP_WIFI		: Serial.print("Wakeup caused by WIFI "); break;
+    case ESP_SLEEP_WAKEUP_COCPU		: Serial.print("Wakeup caused by COCPU int "); break;
+    case ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG: Serial.print("Wakeup caused by COCPU crash "); break;
+    case ESP_SLEEP_WAKEUP_BT		: Serial.print("Wakeup caused by BT "); break;
+    default : Serial.print("Wakeup was not caused by deep sleep "); break;
+    
+    // https://github.com/espressif/esp-idf/blob/279c8ae/components/esp_hw_support/include/esp_sleep.h
   }
-  Serial.println( "(" + String(wakeup_reason) + ")");
-  return wakeup_reason;
+  Serial.println( "(" + String((int)wakeup_reason) + ")");
+  return (int)wakeup_reason;
 }
 
 void TimerWakeUp_setSleepTime(int time_sec){

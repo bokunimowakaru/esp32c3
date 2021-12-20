@@ -55,7 +55,10 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
     delayMicroseconds(300);                     // 280us以上を維持
     volatile int TH, TL;                        // H/Lレベル時間保持用
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
-    noInterrupts();                             // 割り込みの禁止
+
+    vTaskSuspendAll();                          // OSによるSwapOutの防止
+    //  https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3
+    //                     /api-reference/system/freertos.html#task-api
     for(int b=23;b >= 0; b--){                  // 全24ビット分の処理
         if(rgb & (1<<b)){                       // 対象ビットが1のとき
             TH = T1H_num;                       // Hレベルの待ち時間設定
@@ -75,7 +78,7 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
             while(TL>0) TL--;                   // 待ち時間処理
         }
     }
-    interrupts();                               // 割り込みの許可
+    if(!xTaskResumeAll()) taskYIELD();          // OSの再開
 }
 
 void led(int brightness){                       // グレースケール制御
