@@ -67,12 +67,13 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
             TH = T0H_num;                       // Lレベルの待ち時間設定
             TL = T0L_num;                       // Lレベルの待ち時間設定
         }
-        if(TH){
+        yield();                                // 割り込み動作
+        if(TH){                                 // THが0以外の時
             digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
             while(TH>0) TH--;                   // 待ち時間処理
             digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
             while(TL>0) TL--;                   // 待ち時間処理
-        }else{
+        }else{                                  // THが0の時
             digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
             digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
             while(TL>0) TL--;                   // 待ち時間処理
