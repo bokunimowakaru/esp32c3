@@ -41,7 +41,7 @@ int _initial_delay(){                           // 初期ディレイ測定部
     counts = 0;                                 // カウンタのリセット
     do{                                         // 繰り返し処理の開始
         counts++;                               // カウント
-        digitalWrite(_PIN_LED,HIGH);            // (被測定対象)GPIO制御
+        digitalWrite(_PIN_LED,LOW);             // (被測定対象)GPIO制御
         while(i>0);                             // (被測定対象)while
     }while(counts < 1000);                      // 目標未達成時に繰返し
     t = micros() - start - t;                   // 対象処理に要した時間
@@ -59,6 +59,7 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
     vTaskSuspendAll();                          // OSによるSwapOutの防止
     //  https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3
     //                     /api-reference/system/freertos.html#task-api
+    yield();                                    // 割り込み動作
     for(int b=23;b >= 0; b--){                  // 全24ビット分の処理
         if(rgb & (1<<b)){                       // 対象ビットが1のとき
             TH = T1H_num;                       // Hレベルの待ち時間設定
@@ -96,12 +97,14 @@ void led_off(){                                 // LED制御の停止
 void led_setup(int pin){
     _PIN_LED = pin;
     pinMode(_PIN_LED,OUTPUT);                   // ポートを出力に設定
+    digitalWrite(_PIN_LED,LOW);
     delay(100);
     T_Delay = _initial_delay();                 // 信号処理遅延を算出
     T0H_num=_led_delay(T0H_ns);                 // 待ち時間処理回数変換
     T0L_num=_led_delay(T0L_ns);
     T1H_num=_led_delay(T1H_ns);
     T1L_num=_led_delay(T1L_ns);
+    led_off();
 }
 
 void led_setup(){
