@@ -59,7 +59,6 @@ void setup(){                                   // 起動時に一度だけ実�
     WiFi.begin(SSID,PASS);                      // 無線LANアクセスポイント接続
     while(WiFi.status() != WL_CONNECTED){       // 接続に成功するまで待つ
         digitalWrite(PIN_LED, millis()/100%2);  // (通常の)LEDの点滅
-        led((millis()/50) % 10);                // WS2812の点滅
         if(millis() > 30000) sleep();           // 30秒超過でスリープ
         delay(50);                              // 待ち時間処理
     }
@@ -106,7 +105,6 @@ void sleep(){
         i = digitalRead(PIN_SW) ? i+1 : 0;      // ボタン開放時にiに1を加算
         delay(1);                               // 待ち時間処理
     }
-    led_off();                                  // WS2812の消灯
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
     delay(100);                                 // 待ち時間処理
     unsigned long long pin = 1ULL << PIN_SW;	// 起動用IOポートのマスク作成
