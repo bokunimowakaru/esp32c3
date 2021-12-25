@@ -27,7 +27,6 @@ LINE用のトークンを設定すれば、LINEアプリに「ボタンが押さ
  *****************************************************************************/
 #define LINE_TOKEN  "your_token"                // LINE Notify トークン★要設定
 
-
 /******************************************************************************
  Wi-Fi コンシェルジェ証明担当（ワイヤレスLED子機） の設定
  ******************************************************************************
@@ -64,11 +63,12 @@ void setup(){                                   // 起動時に一度だけ実�
     WiFi.begin(SSID,PASS);                      // 無線LANアクセスポイント接続
     while(WiFi.status() != WL_CONNECTED){       // 接続に成功するまで待つ
         digitalWrite(PIN_LED, millis()/100%2);  // (通常の)LEDの点滅
-        led((millis()/50) % 10);                // WS2812の点滅
+        led((millis()/50) % 10);                // (WS2812)LEDの点滅
         if(millis() > 30000) sleep();           // 30秒超過でスリープ
         delay(50);                              // 待ち時間処理
     }
-    led(0,20,0);                                // LEDを緑色で点灯
+    digitalWrite(PIN_LED, HIGH);                // (通常の)LEDを点灯
+    led(0,20,0);                                // (WS2812)LEDを緑色で点灯
     IP_BROAD = WiFi.localIP();                  // IPアドレスを取得
     IP_BROAD[3] = 255;                          // ブロードキャストアドレスに
     Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
@@ -113,7 +113,8 @@ void sleep(){
         i = (digitalRead(PIN_SW) && digitalRead(PIN_BTN)) ? i+1 : 0;
         delay(1);                               // 待ち時間処理
     }
-    led_off();                                  // WS2812の消灯
+    digitalWrite(PIN_LED, LOW);                 // (通常の)LEDを消灯
+    led_off();                                  // (WS2812)LEDの消灯
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
     delay(100);                                 // 待ち時間処理
     unsigned long long pin = 1ULL << PIN_SW;	// 起動用IOポートのマスク作成

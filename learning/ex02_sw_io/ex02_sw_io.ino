@@ -27,7 +27,6 @@ LINE用のトークンを設定すれば、LINEアプリに「ボタンが押さ
  *****************************************************************************/
 #define LINE_TOKEN  "your_token"                // LINE Notify トークン★要設定
 
-
 /******************************************************************************
  Wi-Fi コンシェルジェ証明担当（ワイヤレスLED子機） の設定
  ******************************************************************************
@@ -62,6 +61,7 @@ void setup(){                                   // 起動時に一度だけ実�
         if(millis() > 30000) sleep();           // 30秒超過でスリープ
         delay(50);                              // 待ち時間処理
     }
+    digitalWrite(PIN_LED, HIGH);                // (通常の)LEDを点灯
     IP_BROAD = WiFi.localIP();                  // IPアドレスを取得
     IP_BROAD[3] = 255;                          // ブロードキャストアドレスに
     Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
@@ -104,6 +104,7 @@ void sleep(){
         i = digitalRead(PIN_SW) ? i+1 : 0;      // ボタン開放時にiに1を加算
         delay(1);                               // 待ち時間処理
     }
+    digitalWrite(PIN_LED, LOW);                 // (通常の)LEDを消灯
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
     delay(100);                                 // 待ち時間処理
     unsigned long long pin = 1ULL << PIN_SW;	// 起動用IOポートのマスク作成
