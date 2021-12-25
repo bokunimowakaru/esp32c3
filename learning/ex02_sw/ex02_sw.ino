@@ -24,7 +24,8 @@ LINE用のトークンを設定すれば、LINEアプリに「ボタンが押さ
     7. 下記のLINE_TOKENに貼り付け
  *****************************************************************************/
 #define LINE_TOKEN  "your_token"                // LINE Notify トークン★要設定
-#define PIN_SW 3                                // IO1にボタンを接続
+#define PIN_SW 1                                // IO1 にタクトスイッチを接続
+#define PIN_BTN 3                               // IO3 にボタンを接続(m5stamp)
 #define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
 #define SSID "1234ABCD"                         // 無線LANアクセスポイント SSID
@@ -71,13 +72,17 @@ void loop(){
 }
 
 void sleep(){
-    pinMode(PIN_SW,INPUT_PULLUP);               // ボタン入力の設定
-    Serial.println(digitalRead(PIN_SW));        // ボタン状態をシリアル表示
+    pinMode(PIN_SW,INPUT_PULLUP);               // タクトスイッチ入力の設定
+    pinMode(PIN_BTN,INPUT_PULLUP);              // ボタン入力の設定
+    Serial.println(digitalRead(PIN_SW));        // タクトスイッチ状態を表示
+    Serial.println(digitalRead(PIN_BTN));       // ボタン状態をシリアル表示
     int i = 0;                                  // ループ用の数値変数i
-    while(i<100) i = digitalRead(PIN_SW)?i+1:0; // ボタン解除待ちループ
+    while(i<100) i = digitalRead(PIN_SW)||digitalRead(PIN_BTN) ? i+1 : 0;
+                                                // スイッチ・ボタン解除待ち
     led_off();                                  // WS2812の消灯
     delay(100);                                 // 待ち時間処理
     unsigned long long pin = 1ULL << PIN_SW;	// 起動用IOポートのマスク作成
+    pin |= 1ULL << PIN_BTN;	                    // 起動用IOポートのマスク作成
     esp_deepsleep_gpio_wake_up_mode_t val = ESP_GPIO_WAKEUP_GPIO_LOW;
     esp_deep_sleep_enable_gpio_wakeup(pin,val); // スリープ解除設定
     esp_deep_sleep_start();                     // Deep Sleepモードへ移行

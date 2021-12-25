@@ -60,6 +60,7 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
     //  https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3
     //                     /api-reference/system/freertos.html#task-api
     yield();                                    // 割り込み動作
+    portMUX_TYPE mutex = portMUX_INITIALIZER_UNLOCKED;  // 排他制御用
     for(int b=23;b >= 0; b--){                  // 全24ビット分の処理
         if(rgb & (1<<b)){                       // 対象ビットが1のとき
             TH = T1H_num;                       // Hレベルの待ち時間設定
@@ -70,13 +71,17 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
         }
         yield();                                // 割り込み動作
         if(TH){                                 // THが0以外の時
+            portENTER_CRITICAL_ISR(&mutex);     // 割り込みの禁止
             digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
             while(TH>0) TH--;                   // 待ち時間処理
             digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
+            portEXIT_CRITICAL_ISR(&mutex);      // 割り込み許可
             while(TL>0) TL--;                   // 待ち時間処理
         }else{                                  // THが0の時
+            portENTER_CRITICAL_ISR(&mutex);     // 割り込みの禁止
             digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
             digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
+            portEXIT_CRITICAL_ISR(&mutex);      // 割り込み許可
             while(TL>0) TL--;                   // 待ち時間処理
         }
     }
