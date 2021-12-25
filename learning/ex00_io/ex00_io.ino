@@ -26,7 +26,10 @@ void loop(){                                // 繰り返し実行する関数
         Serial.println("LED ON");           // 「LED ON」をシリアル出力
         digitalWrite(PIN_LED, HIGH);        // IO0をHighレベル(LED点灯)に設定
         int i = 0;                          // ループ用の数値変数iを定義
-        while(i<1000) i = digitalRead(PIN_SW) ? i+1 : 0; // ボタン開放待ち
+        while(i<100){                       // スイッチ・ボタン解除待ち
+            i = digitalRead(PIN_SW)? i+1:0; // ボタン開放時にiに1を加算
+            delay(1);                       // 待ち時間処理
+        }
         digitalWrite(PIN_LED, LOW);         // IO0をLowレベル(LED消灯)に設定
     }
 }
