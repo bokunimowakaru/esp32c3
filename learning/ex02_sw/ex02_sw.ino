@@ -91,7 +91,7 @@ void loop(){
     }
     if(strlen(LED_IP) > 6){                     // 子機IPアドレス設定時
         HTTPClient http;                        // HTTPリクエスト用インスタンス
-        String url = "http://" + LED_IP + "/?L="; // アクセス先URL
+        String url = "http://" + String(LED_IP) + "/?L="; // アクセス先URL
         url += String(digitalRead(PIN_SW) && digitalRead(PIN_BTN));
         http.begin(url);                        // HTTPリクエスト先を設定する
         http.GET();                             // ワイヤレスLEDに送信する
