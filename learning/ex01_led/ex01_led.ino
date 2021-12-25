@@ -45,7 +45,7 @@ void setup(){                               // 起動時に一度だけ実行す
     WiFi.begin(SSID,PASS);                  // 無線LANアクセスポイントへ接続
     morse(PIN_LED,50,"HELLO");              // モールス信号(ピン,速度50,HELLO)
     while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
-        digitalWrite(PIN_LED, digitalRead(PIN_LED));    // (通常の)LEDの点滅
+        digitalWrite(PIN_LED,millis()/100%2); // LEDの点滅
         led((millis()/50) % 10);            // WS2812の点滅
         delay(50);                          // 待ち時間処理
     }
