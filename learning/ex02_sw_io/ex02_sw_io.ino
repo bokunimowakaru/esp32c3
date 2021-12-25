@@ -62,7 +62,6 @@ void setup(){                                   // 起動時に一度だけ実�
         if(millis() > 30000) sleep();           // 30秒超過でスリープ
         delay(50);                              // 待ち時間処理
     }
-    led(0,20,0);                                // LEDを緑色で点灯
     IP_BROAD = WiFi.localIP();                  // IPアドレスを取得
     IP_BROAD[3] = 255;                          // ブロードキャストアドレスに
     Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
