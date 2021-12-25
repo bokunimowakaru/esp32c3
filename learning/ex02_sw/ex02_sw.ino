@@ -81,18 +81,21 @@ void loop(){
     udp.endPacket();                            // UDP送信の終了(実際に送信)
     delay(200);                                 // 送信待ち時間
 
+    HTTPClient http;                            // HTTPリクエスト用インスタンス
+    http.setConnectTimeout(5000);               // タイムアウトを5秒に設定する
+    String url;                                 // URLを格納する文字列変数を生成
     if(strlen(LINE_TOKEN) > 42){                // LINE_TOKEN設定時
-        HTTPClient http;                        // HTTPリクエスト用インスタンス
-        http.begin("https://notify-api.line.me/api/notify");    // アクセス先URL
+        url = "https://notify-api.line.me/api/notify";  // LINEのURLを代入
+        http.begin(url);                        // HTTPリクエスト先を設定する
         http.addHeader("Content-Type","application/x-www-form-urlencoded");
         http.addHeader("Authorization","Bearer " + String(LINE_TOKEN));
         http.POST("message=ボタンが押されました"); // メッセージをLINEへ送信する
         http.end();                             // HTTP通信を終了する
     }
     if(strlen(LED_IP) > 6){                     // 子機IPアドレス設定時
-        HTTPClient http;                        // HTTPリクエスト用インスタンス
-        String url = "http://" + String(LED_IP) + "/?L="; // アクセス先URL
+        url = "http://" + String(LED_IP) + "/?L="; // アクセス先URL
         url += String(digitalRead(PIN_SW) && digitalRead(PIN_BTN));
+        Serial.println(url);                    // タクトスイッチ状態を表示
         http.begin(url);                        // HTTPリクエスト先を設定する
         http.GET();                             // ワイヤレスLEDに送信する
         http.end();                             // HTTP通信を終了する
