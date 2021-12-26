@@ -18,7 +18,6 @@ Example 41 (=32+9): ESP32 (IoTセンサ) Wi-Fi 温湿度計 SENSIRION製 SHT31 �
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
 #define SSID "1234ABCD"                         // 無線LANアクセスポイントのSSID
 #define PASS "password"                         // パスワード
-#define SENDTO "192.168.0.255"                  // 送信先のIPアドレス
 #define PORT 1024                               // 送信のポート番号
 #define SLEEP_P 30*1000000ul                    // スリープ時間 30秒(uint32_t)
 #define DEVICE "humid_1,"                       // デバイス名(5文字+"_"+番号+",")
