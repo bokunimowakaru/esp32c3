@@ -59,7 +59,7 @@ void setup(){                               // 起動時に一度だけ実行す
 void loop() {
     digitalWrite(PIN_EN,HIGH);              // センサ用の電源をONに
     delay(100);                             // 起動待ち時間
-    float lux = AnalogIn(PIN_AIN) * 100. / 33.; // 照度(lux)へ変換
+    float lux = analogRead(PIN_AIN) * 100./ 33.; // 照度(lux)へ変換
     digitalWrite(PIN_EN,LOW);               // センサ用の電源をOFFに
 
     String S = String(DEVICE) + String(lux,0);  // 送信データSにデバイス名を代入
