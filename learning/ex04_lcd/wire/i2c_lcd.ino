@@ -157,12 +157,12 @@ void lcdPrintTime(unsigned long local){
 }
 */
 
-void lcdSetup(byte x, byte y, byte sda,byte scl){
+void lcdSetup(byte x, byte y, byte sda, byte scl){
 	if(x==16||x==8||x==20) _lcd_size_x=x;
 	if(y==1 ||y==2) _lcd_size_y=y;
 	PORT_SDA = sda;
 	PORT_SCL = scl;
-    Wire.begin();
+    Wire.begin(PORT_SDA,PORT_SCL);
 	Wire.beginTransmission(I2C_lcd);	// IS=1
 	Wire.write(0x00);Wire.write(0x39);Wire.endTransmission();
 	delay(10);

@@ -19,8 +19,22 @@ Example 37(=32+5): ESP32 Wi-Fi LCD UDP版
 #define PASS "password"                         // パスワード
 #define PORT 1024                               // 受信ポート番号
 
+WebServer server(80);                       // Webサーバ(ポート80=HTTP)定義
+
+void handleRoot(){
+    String rx, tx;                          // 受信用,送信用文字列
+    led(20,0,0);                                // (WS2812)LEDを赤色に変更
+    if(server.hasArg("TEXT")){              // クエリTEXTが含まれていた時
+        rx = server.arg("TEXT");             // クエリの値を取得し文字変数Sへ代入
+    }
+    tx = getHtml(rx);                        // HTMLコンテンツを取得
+    server.send(200, "text/html", tx);    // HTMLコンテンツを送信
+    Serial.print(rx);                          // シリアルへ出力する
+    lcdPrint(rx);
+    led(0,20,0);                                // (WS2812)LEDを緑色に戻す
+}
+
 WiFiUDP udp;                                    // UDP通信用のインスタンスを定義
-IPAddress IP_BROAD;                             // ブロードキャストIPアドレス
 
 void setup(){                                   // 起動時に一度だけ実行する関数
     led_setup(PIN_LED_RGB);                     // WS2812の初期設定(ポートを設定)
@@ -36,17 +50,17 @@ void setup(){                                   // 起動時に一度だけ実�
     }
     led(0,20,0);                                // (WS2812)LEDを緑色で点灯
     lcdPrintIp(WiFi.localIP());                 // 本機のIPアドレスを液晶に表示
-    Serial.println(WiFi.localIP());             // 本機のIPアドレスをシリアル出力
+    server.on("/", handleRoot);             // HTTP接続時のコールバック先を設定
+    server.begin();                         // Web サーバを起動する
+    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル出力
     udp.begin(PORT);                            // UDP通信御開始
 }
 
 void loop(){                                    // 繰り返し実行する関数
-    char c;                                     // 文字変数cを定義
+    server.handleClient();                  // クライアントからWebサーバ呼び出し
     char lcd[49];                               // 表示用変数を定義(49バイト48文字)
-    int len;                                    // 文字列長を示す整数型変数を定義
-    
     memset(lcd, 0, 49);                         // 文字列変数lcdの初期化(49バイト)
-    len = udp.parsePacket();                    // 受信パケット長を変数lenに代入
+    int len = udp.parsePacket();                    // 受信パケット長を変数lenに代入
     if(len==0)return;                           // 未受信のときはloop()の先頭に戻る
     led(20,0,0);                                // (WS2812)LEDを赤色に変更
     udp.read(lcd, 48);                          // 受信データを文字列変数lcdへ代入
