@@ -287,8 +287,8 @@ void i2c_lcd_init(void){
 	byte data[2];
 	data[0]=0x00; data[1]=0x39; i2c_write(I2C_lcd,data,2);	// IS=1
 	data[0]=0x00; data[1]=0x11; i2c_write(I2C_lcd,data,2);	// OSC
-	data[0]=0x00; data[1]=0x70; i2c_write(I2C_lcd,data,2);	// コントラスト	0
-	data[0]=0x00; data[1]=0x56; i2c_write(I2C_lcd,data,2);	// Power/Cont	6
+	data[0]=0x00; data[1]=0x78; i2c_write(I2C_lcd,data,2);	// コントラスト	8
+	data[0]=0x00; data[1]=0x55; i2c_write(I2C_lcd,data,2);	// Power/Cont 5
 	data[0]=0x00; data[1]=0x6C; i2c_write(I2C_lcd,data,2);	// FollowerCtrl	C
 	delay(200);
 	data[0]=0x00; data[1]=0x38; i2c_write(I2C_lcd,data,2);	// IS=0
