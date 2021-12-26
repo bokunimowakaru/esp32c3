@@ -6,7 +6,8 @@ HTTPによるWebサーバ機能搭載 Wi-FiコンシェルジェがLEDを制御�
 *******************************************************************************/
 
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
-#include <WebServer.h>
+#include <WebServer.h>                      // HTTPサーバ用ライブラリ
+
 #define PIN_LED 0                           // IO 0 に (通常の)LED を接続
 #define PIN_LED_RGB 2                       // IO 2 に WS2812 を接続(m5stamp用)
 // #define PIN_LED_RGB 8                    // IO 8 に WS2812 を接続(DevKitM用)

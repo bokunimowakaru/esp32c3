@@ -6,7 +6,8 @@ HTTPによるWebサーバ機能搭載 Wi-FiコンシェルジェがLEDを制御�
 *******************************************************************************/
 
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
-#include <WebServer.h>
+#include <WebServer.h>                      // HTTPサーバ用ライブラリ
+
 #define PIN_LED 0                           // IO 0 に (通常の)LED を接続
 #define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
 #define PASS "password"                     // パスワード

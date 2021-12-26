@@ -11,6 +11,8 @@ Example 37(=32+5): ESP32 Wi-Fi LCD UDP版
 
 #include <WiFi.h>                               // ESP32用WiFiライブラリ
 #include <WiFiUdp.h>                            // UDP通信を行うライブラリ
+#include <WebServer.h>                          // HTTPサーバ用ライブラリ
+
 #define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
 #define SSID "1234ABCD"                         // 無線LANアクセスポイントのSSID
