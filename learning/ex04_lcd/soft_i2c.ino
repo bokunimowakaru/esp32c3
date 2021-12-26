@@ -13,8 +13,8 @@ Arduino ESP32 用 ソフトウェアI2C ドライバ soft_i2c
 #define GPIO_RETRY	50							// GPIO 切換え時のリトライ回数
 //	#define DEBUG								// デバッグモード
 
-byte PORT_SCL	22								// I2C SCLポート
-byte PORT_SDA	21								// I2C SDAポート
+byte PORT_SCL = 22;								// I2C SCLポート
+byte PORT_SDA = 21;								// I2C SDAポート
 
 unsigned long micros_prev;
 int ERROR_CHECK=1;								// 1:ACKを確認／0:ACKを無視する
@@ -305,8 +305,8 @@ void i2c_lcd_init_xy(byte x, byte y){
 void i2c_lcd_init_xy_sdascl(byte x,byte y,byte sda,byte scl){
 	if(x==16||x==8||x==20) _lcd_size_x=x;
 	if(y==1 ||y==2) _lcd_size_y=y;
-	PORT_SCL = sda;
-	PORT_SDA = scl;
+	PORT_SCL = scl;
+	PORT_SDA = sda;
 	i2c_lcd_init();
 }
 
