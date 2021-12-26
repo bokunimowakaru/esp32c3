@@ -2,101 +2,90 @@
 Example 38(=32+6): ESP32 (IoTセンサ) Wi-Fi 照度計
 照度センサ NJL7502L から取得した照度値を送信するIoTセンサです。
 
-負荷抵抗1kΩの場合、ESP32内蔵ADCの特性上、0.1V(300 lx)以下の検出が出来ません。
-より感度を高めるには負荷抵抗を大きくして下さい。
-
-                                          Copyright (c) 2016-2019 Wataru KUNINO
+                                          Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
+
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
 #include <WiFiUdp.h>                        // UDP通信を行うライブラリ
+#include <HTTPClient.h>                         // HTTPクライアント用ライブラリ
 #include "esp_sleep.h"                      // ESP32用Deep Sleep ライブラリ
-#define PIN_EN 2                            // GPIO 2(24番ピン)をセンサの電源に
-#define PIN_AIN 34                          // GPIO 34 ADC1_CH6(6番ピン)をADCに
+
+#define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
+// #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
+#define PIN_EN 0                            // GPIO 0をセンサの電源に
+#define PIN_AIN 1                          // GPIO 1を照度センサの信号入力に
 #define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
 #define PASS "password"                     // パスワード
-#define SENDTO "192.168.0.255"              // 送信先のIPアドレス
 #define PORT 1024                           // 送信のポート番号
-#define SLEEP_P 50*1000000ul                // スリープ時間 50秒(uint32_t)
+#define SLEEP_P 30*1000000ul                    // スリープ時間 30秒(uint32_t)
 #define DEVICE "illum_1,"                   // デバイス名(5文字+"_"+番号+",")
 
+/******************************************************************************
+ Ambient 設定
+ ******************************************************************************
+ ※Ambientでのアカウント登録と、チャネルID、ライトキーを取得する必要があります。
+    1. https://ambidata.io/ へアクセス
+    2. 右上の[ユーザ登録(無料)]ボタンでメールアドレス、パスワードを設定してアカウントを登録
+    3. [チャネルを作る]ボタンでチャネルIDを新規作成する
+    4. 「チャネルID」を下記のAmb_Idのダブルコート(")内に貼り付ける
+    5. 「ライトキー」を下記のAmb_Keyに貼り付ける
+ (参考文献) IoTデータ可視化サービスAmbient(アンビエントデーター社) https://ambidata.io/
+*******************************************************************************/
+#define Amb_Id  "00000"                         // AmbientのチャネルID 
+#define Amb_Key "0000000000000000"              // Ambientのライトキー
+
+IPAddress IP_BROAD;                             // ブロードキャストIPアドレス
+
 void setup(){                               // 起動時に一度だけ実行する関数
-    int waiting=0;                          // アクセスポイント接続待ち用
+    led_setup(PIN_LED_RGB);                     // WS2812の初期設定(ポート設定)
     pinMode(PIN_AIN,INPUT);                 // アナログ入力の設定
     pinMode(PIN_EN,OUTPUT);                 // センサ用の電源を出力に
     Serial.begin(115200);                   // 動作確認のためのシリアル出力開始
-    Serial.println("ESP32 eg.06 LUM");      // 「Example 06」をシリアル出力表示
-    WiFi.mode(WIFI_STA);                    // 無線LANをSTAモードに設定
-    delay(10);                              // ESP32に必要な待ち時間
-    WiFi.begin(SSID,PASS);                  // 無線LANアクセスポイントへ接続
-    while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
-        delay(100);                         // 待ち時間処理
-        waiting++;                          // 待ち時間カウンタを1加算する
-        digitalWrite(PIN_EN,waiting%2);     // LED(EN信号)の点滅
-        if(waiting%10==0)Serial.print('.'); // 進捗表示
-        if(waiting > 300) sleep();          // 300回(30秒)を過ぎたらスリープ
+    Serial.println("ESP32C3 LUM");              // 「ESP32C3 LUM」をシリアル出力表示
+
+    WiFi.mode(WIFI_STA);                        // 無線LANをSTAモードに設定
+    WiFi.begin(SSID,PASS);                      // 無線LANアクセスポイントへ接続
+    while(WiFi.status() != WL_CONNECTED){       // 接続に成功するまで待つ
+        led((millis()/50) % 10);                // (WS2812)LEDの点滅
+        if(millis() > 30000) sleep();           // 30秒超過でスリープ
+        delay(50);                              // 待ち時間処理
     }
-    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル出力
+    led(0,20,0);                                // (WS2812)LEDを緑色で点灯
+    IP_BROAD = WiFi.localIP();                  // IPアドレスを取得
+    IP_BROAD[3] = 255;                          // ブロードキャストアドレスに
+    Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
 }
 
 void loop() {
-    WiFiUDP udp;                            // UDP通信用のインスタンスを定義
-    float lux;                              // 照度値用の変数
-    
     digitalWrite(PIN_EN,HIGH);              // センサ用の電源をONに
     delay(100);                             // 起動待ち時間
-    lux=mvAnalogIn(PIN_AIN);
+    float lux = AnalogIn(PIN_AIN) * 100. / 33.; // 照度(lux)へ変換
     digitalWrite(PIN_EN,LOW);               // センサ用の電源をOFFに
-    lux *= 100. / 33.;                      // 照度(lux)へ変換
-    udp.beginPacket(SENDTO, PORT);          // UDP送信先を設定
-    udp.print(DEVICE);                      // デバイス名を送信
-    udp.println(lux,0);                     // 照度値を送信
-    Serial.println(lux,0);                  // シリアル出力表示
+
+    String S = String(DEVICE) + String(lux,0);  // 送信データSにデバイス名を代入
+    Serial.println(S);                          // 送信データSをシリアル出力表示
+    WiFiUDP udp;                            // UDP通信用のインスタンスを定義
+    udp.beginPacket(IP_BROAD, PORT);          // UDP送信先を設定
+    udp.println(S);                             // 送信データSをUDP送信
     udp.endPacket();                        // UDP送信の終了(実際に送信する)
-    sleep();
-}
+    if(strcmp(Amb_Id,"00000") == 0) sleep();    // Ambient未設定時にsleepを実行
 
-float mvAnalogIn(uint8_t PIN){
-    return mvAnalogIn(PIN, 0.0);            // 動作最小電圧 0.0 ～ 0.1(V)程度
-//  return mvAnalogIn(PIN, 1.075584e-1);
-}
-
-float mvAnalogIn(uint8_t PIN, float offset){
-    int in0,in3;
-    float ad0,ad3;
-    
-    analogSetPinAttenuation(PIN,ADC_11db);
-    in3=analogRead(PIN);
-    
-    if( in3 > 2599 ){
-        ad3 = -1.457583e-7 * (float)in3 * (float)in3
-            + 1.510116e-3 * (float)in3
-            - 0.680858 + offset;
-    }else{
-        ad3 = 8.378998e-4 * (float)in3 + 8.158714e-2 + offset;
-    }
-    Serial.print("ADC (ATT=3;11dB) = ");
-    Serial.print(ad3,3);
-    Serial.print(" [V], ");
-    Serial.println(in3);
-    if( in3 < 200 ){
-        analogSetPinAttenuation(PIN,ADC_0db);
-        in0=analogRead(PIN);
-        ad0 = 2.442116e-4 * (float)in0 + offset;
-        Serial.print("ADC (ATT=0; 0dB) = ");
-        Serial.print(ad0,3);
-        Serial.print(" [V], "); 
-        Serial.println(in0);
-        if( in3 >= 100 ){
-            ad3 = ad3 * ((float)in3 - 100.) / 100.
-                + ad0 * (200. - (float)in3) / 100.;
-        }else{
-            ad3 = ad0;
-        }
-    }
-    return ad3 * 1000.;
+    S = "{\"writeKey\":\""+String(Amb_Key);     // (項目名)writeKey,(値)ライトキー
+    S += "\",\"d1\":\"" + String(lux,0) + "\"}";      // (項目名)d1,(値)照度
+    HTTPClient http;                            // HTTPリクエスト用インスタンス
+    http.setConnectTimeout(15000);              // タイムアウトを15秒に設定する
+    String url = "http://ambidata.io/api/v2/channels/"+String(Amb_Id)+"/data";
+    http.begin(url);                            // HTTPリクエスト先を設定する
+    http.addHeader("Content-Type","application/json"); // JSON形式を設定する
+    Serial.println(url);                        // 送信URLを表示
+    http.POST(S);                               // センサ値をAmbientへ送信する
+    http.end();                                 // HTTP通信を終了する
+    sleep();                                    // 下記のsleep関数を実行
 }
 
 void sleep(){
     delay(200);                             // 送信待ち時間
+    led_off();                                  // (WS2812)LEDの消灯
+    Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
     esp_deep_sleep(SLEEP_P);                // Deep Sleepモードへ移行
 }
