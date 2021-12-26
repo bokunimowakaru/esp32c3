@@ -1,10 +1,11 @@
 /*******************************************************************************
-Example 37(=32+5): ESP32 Wi-Fi LCD UDP版
+Example 4: ESP32C3 Wi-Fi コンシェルジェ 掲示板担当
 各種IoTセンサが送信したデータを液晶ディスプレイ（LCD）へ表示します。
+HTTPによるWebサーバ機能搭載 Wi-FiコンシェルジェがLCDを制御します。
 
-    ESP32 I2Cポート:
-                        I2C SDAポート GPIO 21
-                        I2C SCLポート GPIO 22
+    I2C LCDポート:
+                        I2C SDAポート GPIO 1
+                        I2C SCLポート GPIO 0
                         
                                           Copyright (c) 2016-2019 Wataru KUNINO
 *******************************************************************************/
@@ -19,17 +20,17 @@ Example 37(=32+5): ESP32 Wi-Fi LCD UDP版
 #define PASS "password"                         // パスワード
 #define PORT 1024                               // 受信ポート番号
 
-WebServer server(80);                       // Webサーバ(ポート80=HTTP)定義
+WebServer server(80);                           // Webサーバ(ポート80=HTTP)定義
 
 void handleRoot(){
-    String rx, tx;                          // 受信用,送信用文字列
+    String rx, tx;                              // 受信用,送信用文字列
     led(20,0,0);                                // (WS2812)LEDを赤色に変更
-    if(server.hasArg("TEXT")){              // クエリTEXTが含まれていた時
-        rx = server.arg("TEXT");             // クエリの値を取得し文字変数Sへ代入
+    if(server.hasArg("TEXT")){                  // クエリTEXTが含まれていた時
+        rx = server.arg("TEXT");                // クエリの値を取得し文字変数Sへ代入
     }
-    tx = getHtml(rx);                        // HTMLコンテンツを取得
-    server.send(200, "text/html", tx);    // HTMLコンテンツを送信
-    Serial.print(rx);                          // シリアルへ出力する
+    tx = getHtml(rx);                           // HTMLコンテンツを取得
+    server.send(200, "text/html", tx);          // HTMLコンテンツを送信
+    Serial.print(rx);                           // シリアルへ出力する
     lcdPrint(rx);
     led(0,20,0);                                // (WS2812)LEDを緑色に戻す
 }
@@ -50,17 +51,17 @@ void setup(){                                   // 起動時に一度だけ実�
     }
     led(0,20,0);                                // (WS2812)LEDを緑色で点灯
     lcdPrintIp(WiFi.localIP());                 // 本機のIPアドレスを液晶に表示
-    server.on("/", handleRoot);             // HTTP接続時のコールバック先を設定
-    server.begin();                         // Web サーバを起動する
-    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル出力
+    server.on("/", handleRoot);                 // HTTP接続時のコールバック先を設定
+    server.begin();                             // Web サーバを起動する
+    Serial.println(WiFi.localIP());             // 本機のIPアドレスをシリアル出力
     udp.begin(PORT);                            // UDP通信御開始
 }
 
 void loop(){                                    // 繰り返し実行する関数
-    server.handleClient();                  // クライアントからWebサーバ呼び出し
+    server.handleClient();                      // クライアントからWebサーバ呼び出し
     char lcd[49];                               // 表示用変数を定義(49バイト48文字)
     memset(lcd, 0, 49);                         // 文字列変数lcdの初期化(49バイト)
-    int len = udp.parsePacket();                    // 受信パケット長を変数lenに代入
+    int len = udp.parsePacket();                // 受信パケット長を変数lenに代入
     if(len==0)return;                           // 未受信のときはloop()の先頭に戻る
     led(20,0,0);                                // (WS2812)LEDを赤色に変更
     udp.read(lcd, 48);                          // 受信データを文字列変数lcdへ代入
