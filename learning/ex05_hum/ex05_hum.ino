@@ -1,18 +1,18 @@
 /*******************************************************************************
-Example 41 (=32+9): ESP32 (IoTセンサ) Wi-Fi 温湿度計 SENSIRION製 SHT31 版
+Example 5: ESP32C3 (IoTセンサ) Wi-Fi 温湿度計 SENSIRION製 SHT31/SHT35 版
 デジタルI2Cインタフェース搭載センサから取得した温湿度を送信するIoTセンサです。
 
     ESP32 のI2Cポート:
-                        I2C SDAポート GPIO 1
-                        I2C SCLポート GPIO 0    設定方法＝shtSetup(SDA,SCL)
+        SHT31/SHT35 SDAポート GPIO 1
+        SHT31/SHT35 SCLポート GPIO 0    設定方法＝shtSetup(SDA,SCL)
 
-                                          Copyright (c) 2016-2021 Wataru KUNINO
+                                          Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 
 #include <WiFi.h>                               // ESP32用WiFiライブラリ
 #include <WiFiUdp.h>                            // UDP通信を行うライブラリ
 #include <HTTPClient.h>                         // HTTPクライアント用ライブラリ
-#include "esp_sleep.h"                          // ESP32用Deep Sleep ライブラリ
+#include "esp_sleep.h"                          // ESP32用Deep Slee2022p ライブラリ
 
 #define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
