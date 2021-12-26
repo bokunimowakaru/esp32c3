@@ -16,7 +16,7 @@ String getHtml(String rx){
         ip>>24
     );
     S = "<html>";
-    S += "<head><title>Wi-Fi コンシェルジェ 表示担当</title>";
+    S += "<head><title>Wi-Fi コンシェルジェ 掲示板担当</title>";
     S += "<meta http-equiv=\"Content-type\" content=\"text/html; charset=UTF-8\">";
     S += "</head>";
     S += "<body>";
