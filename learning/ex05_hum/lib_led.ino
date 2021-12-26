@@ -16,13 +16,14 @@ int _led_delay(int ns){                         // カウンタ設定処理部
     volatile uint32_t i;                        // 繰り返し処理用変数i
     uint32_t target, counts=0;                  // 目標時刻,試行繰返し数
     ns -= T_Delay;                              // 処理遅延分を減算
-    noInterrupts();                             // 割り込みの禁止
+    portMUX_TYPE mutex = portMUX_INITIALIZER_UNLOCKED;  // 排他制御用
+    portENTER_CRITICAL_ISR(&mutex);             // 割り込みの禁止
     do{                                         // 繰り返し処理の開始
         i = ++counts;                           // 試行回数を増やしてiに
         target = micros() + ns / 10;            // 目標時刻を設定
         while(i>0) i--;                         // 待ち時間処理の実行
     }while(micros() < target);                  // 目標未達成時に繰返し
-    interrupts();                               // 割り込みの許可
+    portEXIT_CRITICAL_ISR(&mutex);              // 割り込み許可
     return (counts + 50)/100;                   // 繰り返し回数を応答
 }
 
@@ -30,7 +31,8 @@ int _led_delay(int ns){                         // カウンタ設定処理部
 int _initial_delay(){                           // 初期ディレイ測定部
     volatile uint32_t i=0;                      // 繰り返し処理用変数i
     uint32_t start, t, counts;                  // 開始時刻,試行繰返し数
-    noInterrupts();                             // 割り込みの禁止
+    portMUX_TYPE mutex = portMUX_INITIALIZER_UNLOCKED;  // 排他制御用
+    portENTER_CRITICAL_ISR(&mutex);             // 割り込みの禁止
     start = micros();                           // 開始時刻の保持
     counts = 0;                                 // カウンタのリセット
     do{                                         // 繰り返し処理の開始
@@ -45,7 +47,7 @@ int _initial_delay(){                           // 初期ディレイ測定部
         while(i>0);                             // (被測定対象)while
     }while(counts < 1000);                      // 目標未達成時に繰返し
     t = micros() - start - t;                   // 対象処理に要した時間
-    interrupts();                               // 割り込みの許可
+    portEXIT_CRITICAL_ISR(&mutex);              // 割り込み許可
     return t;                                   // 繰り返し回数を応答
 }
 
@@ -56,11 +58,12 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
     volatile int TH, TL;                        // H/Lレベル時間保持用
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
 
-    vTaskSuspendAll();                          // OSによるSwapOutの防止
+    // vTaskSuspendAll();                          // OSによるSwapOutの防止
     //  https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3
     //                     /api-reference/system/freertos.html#task-api
     yield();                                    // 割り込み動作
     portMUX_TYPE mutex = portMUX_INITIALIZER_UNLOCKED;  // 排他制御用
+    portENTER_CRITICAL_ISR(&mutex);             // 割り込みの禁止
     for(int b=23;b >= 0; b--){                  // 全24ビット分の処理
         if(rgb & (1<<b)){                       // 対象ビットが1のとき
             TH = T1H_num;                       // Hレベルの待ち時間設定
@@ -69,23 +72,19 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
             TH = T0H_num;                       // Lレベルの待ち時間設定
             TL = T0L_num;                       // Lレベルの待ち時間設定
         }
-        yield();                                // 割り込み動作
         if(TH){                                 // THが0以外の時
-            portENTER_CRITICAL_ISR(&mutex);     // 割り込みの禁止
             digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
             while(TH>0) TH--;                   // 待ち時間処理
             digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
-            portEXIT_CRITICAL_ISR(&mutex);      // 割り込み許可
             while(TL>0) TL--;                   // 待ち時間処理
         }else{                                  // THが0の時
-            portENTER_CRITICAL_ISR(&mutex);     // 割り込みの禁止
             digitalWrite(_PIN_LED,HIGH);        // Hレベルを出力
             digitalWrite(_PIN_LED,LOW);         // Lレベルを出力
-            portEXIT_CRITICAL_ISR(&mutex);      // 割り込み許可
             while(TL>0) TL--;                   // 待ち時間処理
         }
     }
-    if(!xTaskResumeAll()) taskYIELD();          // OSの再開
+    portEXIT_CRITICAL_ISR(&mutex);              // 割り込み許可
+    // if(!xTaskResumeAll()) taskYIELD();       // OSの再開
 }
 
 void led(int brightness){                       // グレースケール制御
