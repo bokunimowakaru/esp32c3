@@ -38,7 +38,7 @@ IPAddress IP_BROAD;                             // ブロードキャストIPア
 
 void setup(){                               // 起動時に一度だけ実行する関数
     led_setup(PIN_LED_RGB);                     // WS2812の初期設定(ポート設定)
-    pinMode(PIN_AIN,INPUT);                 // アナログ入力の設定
+    pinMode(PIN_AIN,ANALOG);                 // アナログ入力の設定
     pinMode(PIN_EN,OUTPUT);                 // センサ用の電源を出力に
     Serial.begin(115200);                   // 動作確認のためのシリアル出力開始
     Serial.println("ESP32C3 LUM");              // 「ESP32C3 LUM」をシリアル出力表示
