@@ -4,7 +4,7 @@
 
 I2C接続の温湿度センサの値を読み取る
 SENSIRION社 SHT31
-                               Copyright (c) 2017-2019 Wataru KUNINO
+                               Copyright (c) 2017-2022 Wataru KUNINO
                                https://bokunimo.net/bokunimowakaru/
 *********************************************************************/
 
@@ -43,6 +43,12 @@ float getTemp(){
 
 float getHum(){
     return _i2c_sht31_hum;
+}
+
+void shtSetup(int sda,int scl){
+    delay(2);                   // 1ms以上
+    Wire.begin(sda,scl);        // I2Cインタフェースの使用を開始
+    delay(18);                  // 15ms以上
 }
 
 void shtSetup(){

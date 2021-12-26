@@ -86,6 +86,7 @@ void loop(){
     String url;                                 // URLを格納する文字列変数を生成
     if(strlen(LINE_TOKEN) > 42){                // LINE_TOKEN設定時
         url = "https://notify-api.line.me/api/notify";  // LINEのURLを代入
+        Serial.println(url);                    // 送信URLを表示
         http.begin(url);                        // HTTPリクエスト先を設定する
         http.addHeader("Content-Type","application/x-www-form-urlencoded");
         http.addHeader("Authorization","Bearer " + String(LINE_TOKEN));
@@ -95,7 +96,7 @@ void loop(){
     if(strcmp(LED_IP,"192.168.1.0")){           // 子機IPアドレス設定時
         url = "http://" + String(LED_IP) + "/?L="; // アクセス先URL
         url += String(digitalRead(PIN_SW) && digitalRead(PIN_BTN));
-        Serial.println(url);                    // タクトスイッチ状態を表示
+        Serial.println(url);                    // 送信URLを表示
         http.begin(url);                        // HTTPリクエスト先を設定する
         http.GET();                             // ワイヤレスLEDに送信する
         http.end();                             // HTTP通信を終了する

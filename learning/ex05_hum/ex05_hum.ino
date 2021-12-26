@@ -3,63 +3,93 @@ Example 41 (=32+9): ESP32 (IoTセンサ) Wi-Fi 温湿度計 SENSIRION製 SHT31 �
 デジタルI2Cインタフェース搭載センサから取得した温湿度を送信するIoTセンサです。
 
     ESP32 のI2Cポート:
-                        I2C SDAポート GPIO 21
-                        I2C SCLポート GPIO 22
+                        I2C SDAポート GPIO 1
+                        I2C SCLポート GPIO 0    設定方法＝shtSetup(SDA,SCL)
 
-                                          Copyright (c) 2016-2019 Wataru KUNINO
+                                          Copyright (c) 2016-2021 Wataru KUNINO
 *******************************************************************************/
 
-#include <WiFi.h>                           // ESP32用WiFiライブラリ
-#include <WiFiUdp.h>                        // UDP通信を行うライブラリ
-#include "esp_sleep.h"                      // ESP32用Deep Sleep ライブラリ
-#define PIN_EN 2                            // GPIO 2(24番ピン)をセンサの電源に
-#define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
-#define PASS "password"                     // パスワード
-#define SENDTO "192.168.0.255"              // 送信先のIPアドレス
-#define PORT 1024                           // 送信のポート番号
-#define SLEEP_P 29*60*1000000ul             // スリープ時間 29分(uint32_t)
-#define DEVICE "humid_1,"                   // デバイス名(5文字+"_"+番号+",")
+#include <WiFi.h>                               // ESP32用WiFiライブラリ
+#include <WiFiUdp.h>                            // UDP通信を行うライブラリ
+#include <HTTPClient.h>                         // HTTPクライアント用ライブラリ
+#include "esp_sleep.h"                          // ESP32用Deep Sleep ライブラリ
 
-void setup(){                               // 起動時に一度だけ実行する関数
-    int waiting=0;                          // アクセスポイント接続待ち用
-    pinMode(PIN_EN,OUTPUT);                 // センサ用の電源を出力に
-    digitalWrite(PIN_EN,HIGH);              // センサ用の電源をONに
-    shtSetup();                             // 湿度センサの初期化
-    Serial.begin(115200);                   // 動作確認のためのシリアル出力開始
-    Serial.println("ESP32 eg.09 HUM");      // 「Example 09」をシリアル出力表示
-    WiFi.mode(WIFI_STA);                    // 無線LANをSTAモードに設定
-    WiFi.begin(SSID,PASS);                  // 無線LANアクセスポイントへ接続
-    while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
-        delay(100);                         // 待ち時間処理
-        waiting++;                          // 待ち時間カウンタを1加算する
-        if(waiting%10==0)Serial.print('.'); // 進捗表示
-        if(waiting > 300) sleep();          // 300回(30秒)を過ぎたらスリープ
+#define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
+// #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
+#define SSID "1234ABCD"                         // 無線LANアクセスポイントのSSID
+#define PASS "password"                         // パスワード
+#define SENDTO "192.168.0.255"                  // 送信先のIPアドレス
+#define PORT 1024                               // 送信のポート番号
+#define SLEEP_P 30*1000000ul                    // スリープ時間 30秒(uint32_t)
+#define DEVICE "humid_1,"                       // デバイス名(5文字+"_"+番号+",")
+
+/******************************************************************************
+ Ambient 設定
+ ******************************************************************************
+ ※Ambientでのアカウント登録と、チャネルID、ライトキーを取得する必要があります。
+    1. https://ambidata.io/ へアクセス
+    2. 右上の[ユーザ登録(無料)]ボタンでメールアドレス、パスワードを設定してアカウントを登録
+    3. [チャネルを作る]ボタンでチャネルIDを新規作成する
+    4. 「チャネルID」を下記のAmb_Idのダブルコート(")内に貼り付ける
+    5. 「ライトキー」を下記のAmb_Keyに貼り付ける
+ (参考文献) IoTデータ可視化サービスAmbient(アンビエントデーター社) https://ambidata.io/
+*******************************************************************************/
+#define Amb_Id  "00000"                         // AmbientのチャネルID 
+#define Amb_Key "0000000000000000"              // Ambientのライトキー
+
+IPAddress IP_BROAD;                             // ブロードキャストIPアドレス
+
+void setup(){                                   // 起動時に一度だけ実行する関数
+    led_setup(PIN_LED_RGB);                     // WS2812の初期設定(ポート設定)
+    shtSetup(1,0);                              // 湿度センサの初期化
+    Serial.begin(115200);                       // 動作確認のためのシリアル出力開始
+    Serial.println("ESP32C3 HUM");              // 「ESP32C3 HUM」をシリアル出力
+    
+    WiFi.mode(WIFI_STA);                        // 無線LANをSTAモードに設定
+    WiFi.begin(SSID,PASS);                      // 無線LANアクセスポイントへ接続
+    while(WiFi.status() != WL_CONNECTED){       // 接続に成功するまで待つ
+        led((millis()/50) % 10);                // (WS2812)LEDの点滅
+        if(millis() > 30000) sleep();           // 30秒超過でスリープ
+        delay(50);                              // 待ち時間処理
     }
-    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル出力
+    led(0,20,0);                                // (WS2812)LEDを緑色で点灯
+    IP_BROAD = WiFi.localIP();                  // IPアドレスを取得
+    IP_BROAD[3] = 255;                          // ブロードキャストアドレスに
+    Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
 }
 
 void loop(){
-    WiFiUDP udp;                            // UDP通信用のインスタンスを定義
-    float temp,hum;                         // センサ用の浮動小数点数型変数
-    
-    temp=getTemp();                         // 温度を取得して変数tempに代入
-    hum =getHum();                          // 湿度を取得して変数humに代入
-    if( temp>-100. && hum>=0.){             // 適切な値の時
-        udp.beginPacket(SENDTO, PORT);      // UDP送信先を設定
-        udp.print(DEVICE);                  // デバイス名を送信
-        udp.print(temp,1);                  // 変数tempの値を送信
-        Serial.print(temp,2);               // シリアル出力表示
-        udp.print(", ");                    // 「,」カンマを送信
-        Serial.print(", ");                 // シリアル出力表示
-        udp.println(hum,1);                 // 変数humの値を送信
-        Serial.println(hum,2);              // シリアル出力表示
-        udp.endPacket();                    // UDP送信の終了(実際に送信する)
-    }
-    sleep();
+    float temp = getTemp();                     // 温度を取得して変数tempに代入
+    float hum =getHum();                        // 湿度を取得して変数humに代入
+    if(temp < -100. || hum < 0.) sleep();       // 取得失敗時に末尾のsleepを実行
+
+    String S = String(DEVICE);                  // 送信データSにデバイス名を代入
+    S += String(temp,1) + ", ";                 // 送信データSに変数tempの値を追記
+    S += String(hum,1);                         // 送信データSに変数humの値を追記
+    Serial.println(S);                          // 送信データSをシリアル出力表示
+    WiFiUDP udp;                                // UDP通信用のインスタンスを定義
+    udp.beginPacket(IP_BROAD, PORT);            // UDP送信先を設定
+    udp.println(S);                             // 送信データSをUDP送信
+    udp.endPacket();                            // UDP送信の終了(実際に送信する)
+    if(strcmp(Amb_Id,"00000") == 0) sleep();    // Ambient未設定時にsleepを実行
+
+    S = "{\"writeKey\":\""+String(Amb_Key);     // (項目名)writeKey,(値)ライトキー
+    S += "\",\"d1\":\"" + String(temp,2);       // (項目名)d1,(値)温度
+    S += "\",\"d2\":\"" + String(hum,2) + "\"}"; // (項目名)d2,(値)湿度
+    HTTPClient http;                            // HTTPリクエスト用インスタンス
+    http.setConnectTimeout(15000);              // タイムアウトを15秒に設定する
+    String url = "http://ambidata.io/api/v2/channels/"+String(Amb_Id)+"/data";
+    http.begin(url);                            // HTTPリクエスト先を設定する
+    http.addHeader("Content-Type","application/json"); // JSON形式を設定する
+    Serial.println(url);                        // 送信URLを表示
+    http.POST(S);                               // センサ値をAmbientへ送信する
+    http.end();                                 // HTTP通信を終了する
+    sleep();                                    // 下記のsleep関数を実行
 }
 
 void sleep(){
-    digitalWrite(PIN_EN,LOW);               // センサ用の電源をOFFに
-    delay(200);                             // 送信待ち時間
-    esp_deep_sleep(SLEEP_P);                // Deep Sleepモードへ移行
+    delay(200);                                 // 送信待ち時間
+    led_off();                                  // (WS2812)LEDの消灯
+    Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
+    esp_deep_sleep(SLEEP_P);                    // Deep Sleepモードへ移行
 }
