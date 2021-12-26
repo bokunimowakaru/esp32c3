@@ -4,16 +4,17 @@ Arduino ESP32 用 ソフトウェアI2C ドライバ soft_i2c
 本ソースリストおよびソフトウェアは、ライセンスフリーです。(詳細は別記)
 利用、編集、再配布等が自由に行えますが、著作権表示の改変は禁止します。
 
-							 			Copyright (c) 2014-2019 Wataru KUNINO
+							 			Copyright (c) 2014-2022 Wataru KUNINO
 							 			https://bokunimo.net/bokunimowakaru/
 *******************************************************************************/
 
 #define I2C_lcd 0x3E							// LCD の I2C アドレス 
-#define PORT_SCL	22							// I2C SCLポート
-#define PORT_SDA	21							// I2C SDAポート
 #define	I2C_RAMDA	30							// I2C データシンボル長[us]
 #define GPIO_RETRY	50							// GPIO 切換え時のリトライ回数
 //	#define DEBUG								// デバッグモード
+
+byte PORT_SCL	22								// I2C SCLポート
+byte PORT_SDA	21								// I2C SDAポート
 
 unsigned long micros_prev;
 int ERROR_CHECK=1;								// 1:ACKを確認／0:ACKを無視する
@@ -301,6 +302,14 @@ void i2c_lcd_init_xy(byte x, byte y){
 	i2c_lcd_init();
 }
 
+void i2c_lcd_init_xy_sdascl(byte x,byte y,byte sda,byte scl){
+	if(x==16||x==8||x==20) _lcd_size_x=x;
+	if(y==1 ||y==2) _lcd_size_y=y;
+	PORT_SCL = sda;
+	PORT_SDA = scl;
+	i2c_lcd_init();
+}
+
 void i2c_lcd_print(const char *s){
 	byte i,j;
 	char str[65];
@@ -524,6 +533,10 @@ void lcdPrintVal(const char *s,int in){
 
 void lcdPrintTime(unsigned long local){
 	i2c_lcd_print_time(local);
+}
+
+void lcdSetup(byte x, byte y, byte sda,byte scl){
+	i2c_lcd_init_xy_sdascl(x,y,sda,scl);
 }
 
 void lcdSetup(byte x, byte y){
