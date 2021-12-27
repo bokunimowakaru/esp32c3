@@ -42,8 +42,8 @@ Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ�
 #define PASS "password"                         // パスワード
 #define PORT 1024                               // 受信ポート番号
 #define DEVICE "pir_s_1,"                       // 人感センサ時デバイス名
-#define PIR_XOR 1                               // センサ値の論理反転の有無(送信用)
 // #define DEVICE "rd_sw_1,"                    // ドアセンサ時デバイス名
+#define PIR_XOR 1                               // センサ値の論理反転の有無(送信用)
 
 RTC_DATA_ATTR boolean PIR;                      // pir値のバックアップ保存用
 boolean pir;                                    // 人感センサ値 or ドアセンサ状態値
