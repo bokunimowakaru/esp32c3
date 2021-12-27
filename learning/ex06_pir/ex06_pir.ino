@@ -67,6 +67,7 @@ void setup(){                                   // 起動時に一度だけ実�
 }
 
 void loop(){                                    // 繰り返し実行する関数
+    pir = digitalRead(PIN_PIR);                 // 人感センサの最新の状態を取得
     String S = String(DEVICE);                  // 送信データ保持用の文字列変数
     S += String(int(PIR ^ PIR_XOR)) + ", ";     // 起動時のPIR値を送信データに追記
     S += String(int(pir ^ PIR_XOR));            // 現在のpir値を送信データに追記
