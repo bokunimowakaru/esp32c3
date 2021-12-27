@@ -124,3 +124,27 @@ void sleep(){
     esp_deep_sleep_enable_gpio_wakeup(pin,val); // スリープ解除設定
     esp_deep_sleep_start();                     // Deep Sleepモードへ移行
 }
+
+/*******************************************************************************
+LED_IPに "192.168.1.7" を設定したときの動作例
+********************************************************************************
+10:58:38.084 -> ESP-ROM:esp32c3-api1-20210207
+10:58:38.084 -> Build:Feb  7 2021
+10:58:38.084 -> rst:0x5 (DSLEEP),boot:0xc (SPI_FAST_FLASH_BOOT)
+10:58:38.084 -> SPIWP:0xee
+10:58:38.084 -> mode:DIO, clock div:1
+10:58:38.084 -> load:0x3fcd6100,len:0x420
+10:58:38.134 -> load:0x403ce000,len:0x90c
+10:58:38.134 -> load:0x403d0000,len:0x236c
+10:58:38.134 -> SHA-256 comparison failed:
+10:58:38.134 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+10:58:38.134 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+10:58:38.134 -> Attempting to boot anyway...
+10:58:38.134 -> entry 0x403ce000
+10:58:38.349 -> ESP32C3 SW UDP LINE LED ←-------【起動メッセージ】
+10:58:38.349 ->  Wake = 7 ←---------------------【ボタン起動時7】
+10:58:42.367 -> 192.168.1.255 ←-----------------【UDP送信先】
+10:58:42.599 -> http://192.168.1.7/?L=1 ←-------【HTTP送信】
+10:58:43.397 ->  SW   = 1 ←---------------------【タクトスイッチ開放状態】
+10:58:43.397 ->  Btn  = 1 ←---------------------【本機ボタン開放状態】
+10:58:43.497 -> Sleep... ←----------------------【スリープモードへ移行】*/
