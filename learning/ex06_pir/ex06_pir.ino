@@ -106,8 +106,6 @@ void loop(){                                // 繰り返し実行する関数
 }
 
 void sleep(){
-    while(!digitalRead(PIN_WAKE)) delay(100); // 起動信号がHレベルなるまで待機
-
     int i = 0;                                  // ループ用の数値変数i
     while(i<100){                               // スイッチ・ボタン解除待ち
         boolean pir_b = digitalRead(PIN_PIR);
@@ -126,7 +124,7 @@ void sleep(){
     Serial.println("Going to sleep, now...");
     delay(100);                                 // 待ち時間処理
     unsigned long long pin = 1ULL << PIN_SW;	// 起動用IOポートのマスク作成
-    pin |= 1ULL << PIN_BTN;	                    // 起動用IOポートのマスク作成
+    pin |= 1ULL << PIN_SW;	                    // 起動用IOポートのマスク作成
     esp_deep_sleep_enable_gpio_wakeup(1ul<<PIN_SW, pir_wake);
     esp_deep_sleep_start();                     // Deep Sleepモードへ移行
 }
