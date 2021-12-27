@@ -83,11 +83,33 @@ void loop(){                                    // 繰り返し実行する関�
 12:13:32.860 -> load:0x403ce000,len:0x90c
 12:13:32.860 -> load:0x403d0000,len:0x236c
 12:13:32.860 -> SHA-256 comparison failed:
-12:13:32.860 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-12:13:32.860 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:13:32.860 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:13:32.860 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 12:13:32.860 -> Attempting to boot anyway...
 12:13:32.921 -> entry 0x403ce000
 12:13:33.391 -> ESP32C3 LCD ←-------------------【起動メッセージ】
 12:13:36.508 -> 192.168.1.7 ←-------------------【本機のIPアドレス】
 12:15:34.421 -> ｴﾚｷｼﾞｬｯｸIoT CQpb ←---------------【LCDにメッセージを表示】
+
+********************************************************************************
+ex02_sw や ex03_lum 、 ex05_hum からUDPを受信したときの表示例
+********************************************************************************
+12:25:21.657 -> ESP-ROM:esp32c3-api1-20210207
+12:25:21.690 -> Build:Feb  7 2021
+12:25:21.690 -> rst:0x1 (POWERON),boot:0xc (SPI_FAST_FLASH_BOOT)
+12:25:21.690 -> SPIWP:0xee
+12:25:21.690 -> mode:DIO, clock div:1
+12:25:21.690 -> load:0x3fcd6100,len:0x420
+12:25:21.690 -> load:0x403ce000,len:0x90c
+12:25:21.690 -> load:0x403d0000,len:0x236c
+12:25:21.690 -> SHA-256 comparison failed:
+12:25:21.690 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:25:21.690 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:25:21.690 -> Attempting to boot anyway...
+12:25:21.690 -> entry 0x403ce000
+12:25:22.187 -> ESP32C3 LCD ←-------------------【起動メッセージ】
+12:25:26.333 -> 192.168.1.7 ←-------------------【本機のIPアドレス】
+12:25:38.968 -> Ping ←--------------------------【ex02_sw のボタンが押された】
+12:26:20.355 -> illum_1,1300 ←------------------【ex03_lum の照度1300lx】
+12:26:43.682 -> humid_1,20.6, 58.1 ←------------【ex05_hum の温度20.6℃,湿度58.1%】
 */

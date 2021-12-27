@@ -61,7 +61,7 @@ void loop(){                                // 繰り返し実行する関数
 }
 
 /*******************************************************************************
-インターネット・ブラウザから制御したときの動作例
+インターネット・ブラウザからLEDを制御したときの動作例
 ********************************************************************************
 11:46:44.116 -> ESP-ROM:esp32c3-api1-20210207
 11:46:44.149 -> Build:Feb  7 2021
@@ -72,8 +72,8 @@ void loop(){                                // 繰り返し実行する関数
 11:46:44.149 -> load:0x403ce000,len:0x90c
 11:46:44.149 -> load:0x403d0000,len:0x236c
 11:46:44.149 -> SHA-256 comparison failed:
-11:46:44.149 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-11:46:44.202 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+11:46:44.149 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+11:46:44.202 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 11:46:44.202 -> Attempting to boot anyway...
 11:46:44.202 -> entry 0x403ce000
 11:46:44.381 -> ESP32C3 LED HTTP ←--------------【起動メッセージ】
