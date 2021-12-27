@@ -31,7 +31,7 @@ void handleRoot(){
     }
     tx = getHtml(rx);                           // HTMLコンテンツを取得
     server.send(200, "text/html", tx);          // HTMLコンテンツを送信
-    Serial.print(rx);                           // シリアルへ出力する
+    Serial.println(rx);                         // シリアルへ出力する
     lcdPrint(rx);
     led(0,20,0);                                // (WS2812)LEDを緑色に戻す
 }
@@ -70,3 +70,24 @@ void loop(){                                    // 繰り返し実行する関�
     lcdPrint(lcd);                              // 液晶に表示する
     led(0,20,0);                                // (WS2812)LEDを緑色に戻す
 }
+
+/*******************************************************************************
+インターネット・ブラウザからLCDを制御したときの動作例
+********************************************************************************
+12:13:32.827 -> ESP-ROM:esp32c3-api1-20210207
+12:13:32.860 -> Build:Feb  7 2021
+12:13:32.860 -> rst:0x1 (POWERON),boot:0xc (SPI_FAST_FLASH_BOOT)
+12:13:32.860 -> SPIWP:0xee
+12:13:32.860 -> mode:DIO, clock div:1
+12:13:32.860 -> load:0x3fcd6100,len:0x420
+12:13:32.860 -> load:0x403ce000,len:0x90c
+12:13:32.860 -> load:0x403d0000,len:0x236c
+12:13:32.860 -> SHA-256 comparison failed:
+12:13:32.860 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:13:32.860 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:13:32.860 -> Attempting to boot anyway...
+12:13:32.921 -> entry 0x403ce000
+12:13:33.391 -> ESP32C3 LCD ←-------------------【起動メッセージ】
+12:13:36.508 -> 192.168.1.7 ←-------------------【本機のIPアドレス】
+12:15:34.421 -> ｴﾚｷｼﾞｬｯｸIoT CQpb ←---------------【LCDにメッセージを表示】
+*/
