@@ -89,3 +89,24 @@ void sleep(){
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
     esp_deep_sleep(SLEEP_P);                    // Deep Sleepモードへ移行
 }
+
+/*******************************************************************************
+照度値を取得し、UDP送信したときの動作例
+********************************************************************************
+12:06:05.957 -> ESP-ROM:esp32c3-api1-20210207
+12:06:05.957 -> Build:Feb  7 2021
+12:06:05.957 -> rst:0x5 (DSLEEP),boot:0xc (SPI_FAST_FLASH_BOOT)
+12:06:05.957 -> SPIWP:0xee
+12:06:05.957 -> mode:DIO, clock div:1
+12:06:05.957 -> load:0x3fcd6100,len:0x420
+12:06:05.990 -> load:0x403ce000,len:0x90c
+12:06:05.990 -> load:0x403d0000,len:0x236c
+12:06:05.990 -> SHA-256 comparison failed:
+12:06:05.990 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:06:05.990 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+12:06:05.990 -> Attempting to boot anyway...
+12:06:05.990 -> entry 0x403ce000
+12:06:06.224 -> ESP32C3 LUM ←-------------------【起動メッセージ】
+12:06:09.243 -> 192.168.1.255 ←-----------------【UDP送信先】
+12:06:09.342 -> illum_1,1300 ←------------------【illum_1 照度1300lx】
+12:06:09.541 -> Sleep... ←----------------------【スリープモードへ移行】*/
