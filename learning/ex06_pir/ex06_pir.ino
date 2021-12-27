@@ -1,12 +1,9 @@
 /*******************************************************************************
 Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ版
 
-・回路図はESP書 P.75を参照し、以下に留意
+・回路図は「超特急Web接続! ESPマイコン・プログラム全集」 P.75を参照し、以下に留意
 ・人感センサの出力インピーダンスが低い。FETかトランジスタで反転させIO 10に入力
-・人感センサからESP32を起動するための信号は,ESP32のEN入力またはPIN_WAKEに入力
-　※PIN_WAKEを使用する場合は回路図から変更が必要
-　　（ここでは、一例として、ESP32C3 IO4に接続する）
-・LEDはIO2に接続
+・検知時にHighとなるときはPIR_XORを0に、LowになるときはPIR_XORを1に設定する
 
                                            Copyright (c) 2016-2019 Wataru KUNINO
 *******************************************************************************/
@@ -45,6 +42,7 @@ Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ�
 #define PASS "password"                         // パスワード
 #define PORT 1024                               // 受信ポート番号
 #define DEVICE "pir_s_1,"                       // 人感センサ時デバイス名
+#define PIR_XOR 1                               // センサ値の論理反転の有無(送信用)
 // #define DEVICE "rd_sw_1,"                    // ドアセンサ時デバイス名
 
 RTC_DATA_ATTR boolean PIR;                      // pir値のバックアップ保存用
@@ -79,7 +77,8 @@ void setup(){                                   // 起動時に一度だけ実�
 
 void loop(){                                    // 繰り返し実行する関数
     String S = String(DEVICE);                  // 送信データ保持用の文字列変数
-    S += String(int(PIR))+", "+String(int(pir)); // 送信データを追記
+    S += String(int(PIR ^ PIR_XOR)) + ", ";     // 起動時のPIR値を送信データに追記
+    S += String(int(pir ^ PIR_XOR));            // 現在のpir値を送信データに追記
     Serial.println(S);                          // シリアル出力表示
 
     WiFiUDP udp;                                // UDP通信用のインスタンスを定義
@@ -97,7 +96,7 @@ void loop(){                                    // 繰り返し実行する関�
         http.begin(url);                        // HTTPリクエスト先を設定する
         http.addHeader("Content-Type","application/x-www-form-urlencoded");
         http.addHeader("Authorization","Bearer " + String(LINE_TOKEN));
-        http.POST("message=センサが反応しました。Value=" + String(pir)); // メッセージをLINEへ送信する
+        http.POST("message=センサが反応しました。(" + S.substring(8) + ")");
         http.end();                             // HTTP通信を終了する
     }
     sleep();                                    // 下記のsleep関数を実行
@@ -139,4 +138,33 @@ BS612 AS612(NANYANG SENBA OPTICAL AND ELECTRONIC CO. LTD.)
 5.REL		出力 ⇒ FETかトランジスタで受けてから使用する
 6.ONTIME	ホールド時間設定 0.48V 30秒程度
 
+*/
+
+/*******************************************************************************
+初期起動後、人感センサが反応したときの動作例
+********************************************************************************
+（初期起動・一部略）
+21:10:29.970 -> ESP32C3 PIR/Reed ←--------------【起動メッセージ】
+21:10:29.970 ->  Wake = 0 ←---------------------【リセット起動時0】
+21:10:30.070 -> Sleep... ←----------------------【スリープモードへ移行】
+
+（センサ反応時）
+21:10:50.968 -> ESP-ROM:esp32c3-api1-20210207
+21:10:50.968 -> Build:Feb  7 2021
+21:10:51.090 -> rst:0x5 (DSLEEP),boot:0xc (SPI_FAST_FLASH_BOOT)
+21:10:51.090 -> SPIWP:0xee
+21:10:51.090 -> mode:DIO, clock div:1
+21:10:51.090 -> load:0x3fcd6100,len:0x420
+21:10:51.090 -> load:0x403ce000,len:0x90c
+21:10:51.090 -> load:0x403d0000,len:0x236c
+21:10:51.090 -> SHA-256 comparison failed:
+21:10:51.090 -> Calculated: ccb0d00bac7e84e1d90a12e4f75f4ab6c5f7e71bb209afd5819c4c9557a6db71
+21:10:51.090 -> Expected: c9cf160580940ec7801c73b16423824e72ad12055c732e83ce66332240af42a7
+21:10:51.090 -> Attempting to boot anyway...
+21:10:51.090 -> entry 0x403ce000
+21:10:51.233 -> ESP32C3 PIR/Reed ←--------------【起動メッセージ】
+21:10:51.233 ->  Wake = 7 ←---------------------【ボタン起動時7】
+21:10:54.252 -> 192.168.1.255 ←-----------------【UDP送信先】
+21:10:54.252 -> pir_s_1,1, 1 ←------------------【検知時に1】
+21:10:54.365 -> Sleep... ←----------------------【スリープモードへ移行】
 */
