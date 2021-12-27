@@ -127,7 +127,7 @@ void sleep(){
     delay(100);                                 // 待ち時間処理
     unsigned long long pin = 1ULL << PIN_SW;	// 起動用IOポートのマスク作成
     pin |= 1ULL << PIN_BTN;	                    // 起動用IOポートのマスク作成
-    esp_deep_sleep_enable_gpio_wakeup(1ul<<PIN_WAKE, pir_wake);
+    esp_deep_sleep_enable_gpio_wakeup(1ul<<PIN_SW, pir_wake);
     esp_deep_sleep_start();                     // Deep Sleepモードへ移行
 }
 
