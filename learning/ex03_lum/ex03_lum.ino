@@ -56,7 +56,7 @@ void setup(){                                   // 起動時に一度だけ実�
     Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
 }
 
-void loop() {
+void loop(){                                    // 繰り返し実行する関数
     digitalWrite(PIN_EN,HIGH);                  // センサ用の電源をONに
     delay(100);                                 // 起動待ち時間
     float lux = analogRead(PIN_AIN) * 100./ 33.; // 照度(lux)へ変換
@@ -83,7 +83,7 @@ void loop() {
     sleep();                                    // 下記のsleep関数を実行
 }
 
-void sleep(){
+void sleep(){                                   // スリープ実行用の関数    Serial.print(" SW   = ");                   // 「SW = 」をシリアル出力表示
     delay(200);                                 // 送信待ち時間
     led_off();                                  // (WS2812)LEDの消灯
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
@@ -109,4 +109,5 @@ void sleep(){
 12:06:06.224 -> ESP32C3 LUM ←-------------------【起動メッセージ】
 12:06:09.243 -> 192.168.1.255 ←-----------------【UDP送信先】
 12:06:09.342 -> illum_1,1300 ←------------------【illum_1 照度1300lx】
-12:06:09.541 -> Sleep... ←----------------------【スリープモードへ移行】*/
+12:06:09.541 -> Sleep... ←----------------------【スリープモードへ移行】
+*/

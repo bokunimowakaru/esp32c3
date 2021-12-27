@@ -67,7 +67,7 @@ void setup(){                                   // 起動時に一度だけ実�
     Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
 }
 
-void loop(){
+void loop(){                                    // 繰り返し実行する関数
     WiFiUDP udp;                                // UDP通信用のインスタンス定義
     udp.beginPacket(IP_BROAD, PORT);            // UDP送信先を設定
     udp.println("Ping");                        // メッセージ"Ping"を送信
@@ -97,8 +97,8 @@ void loop(){
     sleep();                                    // 下記のsleep関数を実行
 }
 
-void sleep(){
-    Serial.print(" SW   = ");                   // 「SW = 」をシリアル出力表示
+
+void sleep(){                                   // スリープ実行用の関数    Serial.print(" SW   = ");                   // 「SW = 」をシリアル出力表示
     Serial.println(digitalRead(PIN_SW));        // タクトスイッチ状態を表示
     int i = 0;                                  // ループ用の数値変数i
     while(i<100){                               // スイッチ・ボタン解除待ち

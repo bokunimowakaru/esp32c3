@@ -57,7 +57,7 @@ void setup(){                                   // 起動時に一度だけ実�
     Serial.println(IP_BROAD);                   // ブロードキャストアドレス表示
 }
 
-void loop(){
+void loop(){                                    // 繰り返し実行する関数
     float temp = getTemp();                     // 温度を取得して変数tempに代入
     float hum =getHum();                        // 湿度を取得して変数humに代入
     if(temp < -100. || hum < 0.) sleep();       // 取得失敗時に末尾のsleepを実行
@@ -86,7 +86,7 @@ void loop(){
     sleep();                                    // 下記のsleep関数を実行
 }
 
-void sleep(){
+void sleep(){                                   // スリープ実行用の関数    Serial.print(" SW   = ");                   // 「SW = 」をシリアル出力表示
     delay(200);                                 // 送信待ち時間
     led_off();                                  // (WS2812)LEDの消灯
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
@@ -96,21 +96,38 @@ void sleep(){
 /*******************************************************************************
 温度値と湿度値を取得し、UDP送信したときの動作例
 ********************************************************************************
-ESP-ROM:esp32c3-api1-20210207
-11:57:20.152 -> Build:Feb  7 2021
-11:57:20.186 -> rst:0x5 (DSLEEP),boot:0xc (SPI_FAST_FLASH_BOOT)
-11:57:20.186 -> SPIWP:0xee
-11:57:20.186 -> mode:DIO, clock div:1
-11:57:20.186 -> load:0x3fcd6100,len:0x420
-11:57:20.186 -> load:0x403ce000,len:0x90c
-11:57:20.186 -> load:0x403d0000,len:0x236c
-11:57:20.186 -> SHA-256 comparison failed:
-11:57:20.186 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-11:57:20.186 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-11:57:20.186 -> Attempting to boot anyway...
-11:57:20.240 -> entry 0x403ce000
-11:57:20.452 -> ESP32C3 HUM ←-------------------【起動メッセージ】
-11:57:23.475 -> 192.168.1.255 ←-----------------【UDP送信先】
-11:57:23.533 -> humid_1,20.6, 58.1 ←------------【humid_1 温度20.6℃,湿度58.1%】
-11:57:23.706 -> Sleep... ←----------------------【スリープモードへ移行】
+ESP-ROM:esp32c3-api1-20210207
+
+11:57:20.152 -> Build:Feb  7 2021
+
+11:57:20.186 -> rst:0x5 (DSLEEP),boot:0xc (SPI_FAST_FLASH_BOOT)
+
+11:57:20.186 -> SPIWP:0xee
+
+11:57:20.186 -> mode:DIO, clock div:1
+
+11:57:20.186 -> load:0x3fcd6100,len:0x420
+
+11:57:20.186 -> load:0x403ce000,len:0x90c
+
+11:57:20.186 -> load:0x403d0000,len:0x236c
+
+11:57:20.186 -> SHA-256 comparison failed:
+
+11:57:20.186 -> Calculated: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+11:57:20.186 -> Expected: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+11:57:20.186 -> Attempting to boot anyway...
+
+11:57:20.240 -> entry 0x403ce000
+
+11:57:20.452 -> ESP32C3 HUM ←-------------------【起動メッセージ】
+
+11:57:23.475 -> 192.168.1.255 ←-----------------【UDP送信先】
+
+11:57:23.533 -> humid_1,20.6, 58.1 ←------------【humid_1 温度20.6℃,湿度58.1%】
+
+11:57:23.706 -> Sleep... ←----------------------【スリープモードへ移行】
+
 */

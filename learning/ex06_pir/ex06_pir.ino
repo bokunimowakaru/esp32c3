@@ -62,7 +62,6 @@ void setup(){                                   // 起動時に一度だけ実�
     Serial.println("ESP32C3 PIR/Reed");         // 「ESP32C3 PIR/Reed」を出力
     Serial.print(" Wake = ");                   // 「wake =」をシリアル出力表示
     Serial.println(wake);                       // 起動理由noをシリアル出力表示
-    if(wake == 0) PIR = pir;                    // ボタン以外で起動時にPIR値を設定
     if(wake != 7) sleep();                      // ボタン以外で起動時にスリープ
 
     WiFi.mode(WIFI_STA);                        // 無線LANをSTAモードに設定
@@ -79,14 +78,13 @@ void setup(){                                   // 起動時に一度だけ実�
 }
 
 void loop(){                                    // 繰り返し実行する関数
+    String S = String(DEVICE);                  // 送信データ保持用の文字列変数
+    S += String(int(PIR))+", "+String(int(pir)); // 送信データを追記
+    Serial.println(S);                          // シリアル出力表示
+
     WiFiUDP udp;                                // UDP通信用のインスタンスを定義
     udp.beginPacket(IP_BROAD, PORT);            // UDP送信先を設定
-    udp.print(DEVICE);                          // デバイス名を送信
-    udp.print(PIR);                             // 起動時のセンサ状態を送信
-    udp.print(", ");                            // 「,」カンマと「␣」を送信
-    pir = digitalRead(PIN_PIR);                 // 人感センサの状態を取得
-    udp.println(pir);                           // 現在のセンサの状態を送信
-    Serial.println(pir);                        // シリアル出力表示
+    udp.println(S);                             // センサ値を送信
     udp.endPacket();                            // UDP送信の終了(実際に送信する)
     delay(10);                                  // 送信待ち時間
 
@@ -105,28 +103,25 @@ void loop(){                                    // 繰り返し実行する関�
     sleep();                                    // 下記のsleep関数を実行
 }
 
-void sleep(){
+void sleep(){                                   // スリープ実行用の関数
     int i = 0;                                  // ループ用の数値変数i
     while(i<100){                               // スイッチ・ボタン解除待ち
-        boolean pir_b = digitalRead(PIN_PIR);
-        if( pir == pir_b){
-            i++;
-        }else{
-            i = 0;
-            pir = pir_b;
+        boolean pir_b = digitalRead(PIN_PIR);   // 現在の値をpir_bに保存
+        if( pir == pir_b) i++;                  // 値に変化がない時はiに1を加算
+        else{                                   // 変化があった時
+            i = 0;                              // 繰り返し用変数iを0に
+            pir = pir_b;                        // pir値を最新の値に更新
         }
         delay(1);                               // 待ち時間処理
     }
-    PIR = !pir;
-    if(PIR) pir_wake = ESP_GPIO_WAKEUP_GPIO_HIGH;
-    else    pir_wake = ESP_GPIO_WAKEUP_GPIO_LOW;
+    PIR = !pir;                                 // sleep時の保存可能な変数に保持
+    if(PIR) pir_wake = ESP_GPIO_WAKEUP_GPIO_HIGH; // 次回、IOがHighのときに起動
+    else    pir_wake = ESP_GPIO_WAKEUP_GPIO_LOW;  // 次回、IOがLowのときに起動
     led_off();                                  // (WS2812)LEDの消灯
-
-    Serial.println("Going to sleep, now...");
-    delay(100);                                 // 待ち時間処理
+    Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
+    delay(10);                                  // 待ち時間処理
     unsigned long long pin = 1ULL << PIN_PIR;	// 起動用IOポートのマスク作成
-    pin |= 1ULL << PIN_PIR;	                    // 起動用IOポートのマスク作成
-    esp_deep_sleep_enable_gpio_wakeup(1ul<<PIN_PIR, pir_wake);
+    esp_deep_sleep_enable_gpio_wakeup(pin, pir_wake); // スリープ解除設定
     esp_deep_sleep_start();                     // Deep Sleepモードへ移行
 }
 
