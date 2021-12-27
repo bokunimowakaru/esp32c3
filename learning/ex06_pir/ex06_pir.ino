@@ -1,7 +1,7 @@
 /*******************************************************************************
 Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ版
 
-・回路図は「超特急Web接続! ESPマイコン・プログラム全集」 P.75を参照し、以下に留意
+・回路図は「超特急Web接続! ESPマイコン・プログラム全集」 P.75を参照し、以下留意
 ・人感センサの出力インピーダンスが低い。FETかトランジスタで反転させIO 10に入力
 ・検知時にHighとなるときはPIR_XORを0に、LowになるときはPIR_XORを1に設定する
 
@@ -26,28 +26,28 @@ Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ�
  *****************************************************************************/
 #define LINE_TOKEN  "your_token"                // LINE Notify トークン★要設定
 
-#define PIN_PIR 1                               // IO 1にセンサ(人感/ドア)を接続
+#define PIN_PIR 1                               // IO1にセンサ(人感/ドア)を接続
 #define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
-#define SSID "1234ABCD"                         // 無線LANアクセスポイントのSSID
+#define SSID "1234ABCD"                         // 無線LANアクセスポイントSSID
 #define PASS "password"                         // パスワード
 #define PORT 1024                               // 受信ポート番号
 #define DEVICE "pir_s_1,"                       // 人感センサ時デバイス名
 // #define DEVICE "rd_sw_1,"                    // ドアセンサ時デバイス名
-#define PIR_XOR 1                               // センサ値の論理反転の有無(送信用)
+#define PIR_XOR 1                               // センサ送信値の論理反転の有無
 
 RTC_DATA_ATTR boolean PIR;                      // pir値のバックアップ保存用
-boolean pir;                                    // 人感センサ値 or ドアセンサ状態値
+boolean pir;                                    // 人感センサ値orドアセンサ状態
 esp_deepsleep_gpio_wake_up_mode_t pir_wake;     // 起動用のpir値
 IPAddress IP_BROAD;                             // ブロードキャストIPアドレス
 int wake = (int)esp_sleep_get_wakeup_cause();   // 起動理由を変数wakeに保存
 
 void setup(){                                   // 起動時に一度だけ実行する関数
-    pinMode(PIN_PIR,INPUT);                     // センサを接続したポートを入力に
+    pinMode(PIN_PIR,INPUT);                     // センサ接続したポートを入力に
     pir = digitalRead(PIN_PIR);                 // 人感センサの状態を取得
     led_setup(PIN_LED_RGB);                     // WS2812の初期設定(ポート設定)
 
-    Serial.begin(115200);                       // 動作確認のためのシリアル出力開始
+    Serial.begin(115200);                       // 動作確認のためのシリアル出力
     Serial.println("ESP32C3 PIR/Reed");         // 「ESP32C3 PIR/Reed」を出力
     Serial.print(" Wake = ");                   // 「wake =」をシリアル出力表示
     Serial.println(wake);                       // 起動理由noをシリアル出力表示
@@ -69,7 +69,7 @@ void setup(){                                   // 起動時に一度だけ実�
 void loop(){                                    // 繰り返し実行する関数
     pir = digitalRead(PIN_PIR);                 // 人感センサの最新の状態を取得
     String S = String(DEVICE);                  // 送信データ保持用の文字列変数
-    S += String(int(PIR ^ PIR_XOR)) + ", ";     // 起動時のPIR値を送信データに追記
+    S += String(int(PIR ^ PIR_XOR)) + ", ";     // 起動時PIR値を送信データに追記
     S += String(int(pir ^ PIR_XOR));            // 現在のpir値を送信データに追記
     Serial.println(S);                          // シリアル出力表示
 

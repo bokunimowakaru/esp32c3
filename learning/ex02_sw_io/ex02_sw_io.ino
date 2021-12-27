@@ -2,8 +2,8 @@
 Example 2: ESP32 (IoTセンサ) Wi-Fi ボタン
 ボタンを押下するとUDPでLAN内に文字列"Ping"を送信します。
 LINE用のトークンを設定すれば、LINEアプリに「ボタンが押されました」を通知します。
-別の子機となる Wi-Fi コンシェルジェ証明担当（ワイヤレスLED子機）のIPアドレスを設定すれば、
-ボタンを押下したときにLEDをON、長押ししたときにOFFにワイヤレス通信制御します。
+別の子機となる Wi-Fi コンシェルジェ証明担当（ワイヤレスLED子機）のIPアドレスを
+設定すれば、ボタンを押下したときにLEDをON、押し続けたときにOFFに制御します。
 
                                           Copyright (c) 2021-2022 Wataru KUNINO
 *******************************************************************************/
@@ -31,10 +31,10 @@ LINE用のトークンを設定すれば、LINEアプリに「ボタンが押さ
  Wi-Fi コンシェルジェ証明担当（ワイヤレスLED子機） の設定
  ******************************************************************************
  ※ex01_led または ex01_led_io が動作する、別のESP32C3搭載デバイスが必要です
-    1. ex01_led/ex01_led_io搭載デバイスを実行し、シリアルターミナルでIPアドレスを確認する
+    1. ex01_led/ex01_led_io搭載デバイスのシリアルターミナルでIPアドレスを確認
     2. 下記のLED_IPのダブルコート(")内に貼り付け
  *****************************************************************************/
-#define LED_IP "192.168.1.0"                    // LED搭載子機のIPアドレス★要設定
+#define LED_IP "192.168.1.0"                    // LED搭載子機IPアドレス★要設定
 
 #define PIN_LED 0                               // IO 0 に (通常の)LED を接続
 #define PIN_SW 1                                // IO1 にタクトスイッチを接続
@@ -46,7 +46,7 @@ IPAddress IP_BROAD;                             // ブロードキャストIPア
 int wake = (int)esp_sleep_get_wakeup_cause();   // 起動理由を変数wakeに保存
 
 void setup(){                                   // 起動時に一度だけ実行する関数
-    pinMode(PIN_LED, OUTPUT);                   // (通常の)LED用のIOポートを出力に
+    pinMode(PIN_LED, OUTPUT);                   // (通常の)LED用IOポートを出力に
     pinMode(PIN_SW,INPUT_PULLUP);               // タクトスイッチ入力の設定
     Serial.begin(115200);                       // 動作確認のためのシリアル出力
     Serial.println("ESP32C3 SW UDP LINE LED");  // 「SW UDP」をシリアル出力表示
@@ -98,7 +98,7 @@ void loop(){                                    // 繰り返し実行する関�
 }
 
 
-void sleep(){                                   // スリープ実行用の関数    Serial.print(" SW   = ");                   // 「SW = 」をシリアル出力表示
+void sleep(){                                   // スリープ実行用の関数
     Serial.println(digitalRead(PIN_SW));        // タクトスイッチ状態を表示
     int i = 0;                                  // ループ用の数値変数i
     while(i<100){                               // スイッチ・ボタン解除待ち
