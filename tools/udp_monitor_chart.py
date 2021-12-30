@@ -8,6 +8,9 @@
 #                                               Copyright (c) 2021 Wataru KUNINO
 ################################################################################
 
+# 最新版は下記を参照ください。
+# https://github.com/bokunimowakaru/udp/blob/master/udp_monitor/udp_monitor_chart.py
+
 # 初期設定
 UDP_PORT = 1024             # UDP待ち受けポート番号(デフォルトは1024)
 HTTP_PORT = 80              # HTTP待ち受けポート番号(デフォルトは80->失敗時8080)
