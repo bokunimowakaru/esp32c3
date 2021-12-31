@@ -13,20 +13,20 @@ HTTPによるWebサーバ機能搭載 Wi-FiコンシェルジェがLEDを制御�
 #define PASS "password"                     // パスワード
 
 WebServer server(80);                       // Webサーバ(ポート80=HTTP)定義
+int led_stat = 0;                           // LED状態用の数値変数led_statを定義
 
 void handleRoot(){
     char html[2048];                        // Web表示用コンテンツ格納用変数
-    int i = 0;                              // 数値変数iを定義
 
     if(server.hasArg("L")){                 // 引数Lが含まれていた時
         String s = server.arg("L");         // 引数Lの値を取得し文字変数sへ代入
-        i = s.toInt();                      // 文字変数sから数値を取得し変数iへ
+        led_stat = s.toInt();               // 変数sから数値を取得しled_statへ
     }
-    getHtml(html,i);                        // HTMLコンテンツを取得
+    getHtml(html, led_stat);                // HTMLコンテンツを取得
     server.send(200, "text/html", html);    // HTMLコンテンツを送信
 
-    Serial.println(i);                      // 入力値を表示
-    if(abs(i) >= 1){                        // 変数iの絶対値が1以上の時
+    Serial.println(led_stat);               // LED状態led_stat値を表示
+    if(abs(led_stat) >= 1){                 // led_statの絶対値が1以上の時
         digitalWrite(PIN_LED, HIGH);        // LEDを点灯
     }else{
         digitalWrite(PIN_LED, LOW);         // LEDを消灯
