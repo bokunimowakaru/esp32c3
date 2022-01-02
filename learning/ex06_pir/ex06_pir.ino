@@ -111,7 +111,7 @@ void sleep(){                                   // スリープ実行用の関�
     led_off();                                  // (WS2812)LEDの消灯
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
     delay(10);                                  // 待ち時間処理
-    unsigned long long pin = 1ULL << PIN_PIR;	// 起動用IOポートのマスク作成
+    uint64_t pin = 1ULL << PIN_SW;              // 起動用IOポートのマスク作成
     esp_deep_sleep_enable_gpio_wakeup(pin, pir_wake); // スリープ解除設定
     esp_deep_sleep_start();                     // Deep Sleepモードへ移行
 }
