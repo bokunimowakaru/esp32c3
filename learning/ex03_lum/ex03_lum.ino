@@ -2,6 +2,9 @@
 Example 3: ESP32C3 (IoTセンサ) Wi-Fi 照度計
 照度センサ NJL7502L から取得した照度値を送信するIoTセンサです。
 
+    負荷抵抗が1kΩのとき下式で照度値を得ます
+    照度（lx）= 100(lx) × 入力電圧(mV) ÷ 33(mV)
+
                                           Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 
@@ -61,7 +64,8 @@ void setup(){                                   // 起動時に一度だけ実�
 void loop(){                                    // 繰り返し実行する関数
     digitalWrite(PIN_EN,HIGH);                  // センサ用の電源をONに
     delay(100);                                 // 起動待ち時間
-    float lux = analogRead(PIN_AIN) * 100./ 33.; // 照度(lux)へ変換
+    float mv = analogRead(PIN_AIN)* 3300./ 4095.; // センサ電圧を変数mvに保持
+    float lux = 100.* mv / 33.;                 // 照度(lux)へ変換(負荷抵抗1kΩ)
     digitalWrite(PIN_EN,LOW);                   // センサ用の電源をOFFに
 
     String S = String(DEVICE) + String(lux,0);  // 送信データSにデバイス名を代入
