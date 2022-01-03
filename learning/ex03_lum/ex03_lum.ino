@@ -64,7 +64,7 @@ void setup(){                                   // 起動時に一度だけ実�
 void loop(){                                    // 繰り返し実行する関数
     digitalWrite(PIN_EN,HIGH);                  // センサ用の電源をONに
     delay(100);                                 // 起動待ち時間
-    float mv = analogRead(PIN_AIN)* 3300./ 4095.; // センサ電圧を変数mvに保持
+    float mv = analogRead(PIN_AIN)* 2500./ 4095.; // センサ電圧を変数mvに保持
     float lux = 100.* mv / 33.;                 // 照度(lux)へ変換(負荷抵抗1kΩ)
     digitalWrite(PIN_EN,LOW);                   // センサ用の電源をOFFに
 
