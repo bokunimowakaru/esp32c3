@@ -27,7 +27,7 @@ void handleRoot(){
     String rx, tx;                              // 受信用,送信用文字列
     led(20,0,0);                                // (WS2812)LEDを赤色に変更
     if(server.hasArg("TEXT")){                  // クエリTEXTが含まれていた時
-        rx = server.arg("TEXT");                // クエリ値を文字変数Sへ代入
+        rx = server.arg("TEXT");                // クエリ値を文字変数rxへ代入
     }
     tx = getHtml(rx);                           // HTMLコンテンツを取得
     server.send(200, "text/html", tx);          // HTMLコンテンツを送信
