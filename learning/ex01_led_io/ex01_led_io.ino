@@ -16,14 +16,14 @@ WebServer server(80);                       // Webサーバ(ポート80=HTTP)定
 int led_stat = 0;                           // LED状態用の数値変数led_statを定義
 
 void handleRoot(){
-    char html[2048];                        // Web表示用コンテンツ格納用変数
+    String rx, tx;                          // 受信用,送信用文字列
 
     if(server.hasArg("L")){                 // 引数Lが含まれていた時
-        String s = server.arg("L");         // 引数Lの値を取得し文字変数sへ代入
-        led_stat = s.toInt();               // 変数sから数値を取得しled_statへ
+        rx = server.arg("L");               // 引数Lの値を取得し文字変数rxへ代入
+        led_stat = rx.toInt();              // 変数sから数値を取得しled_statへ
     }
-    getHtml(html, led_stat);                // HTMLコンテンツを取得
-    server.send(200, "text/html", html);    // HTMLコンテンツを送信
+    tx = getHtml(led_stat);                 // HTMLコンテンツを取得
+    server.send(200, "text/html", tx);      // HTMLコンテンツを送信
 
     Serial.println(led_stat);               // LED状態led_stat値を表示
     if(abs(led_stat) >= 1){                 // led_statの絶対値が1以上の時
