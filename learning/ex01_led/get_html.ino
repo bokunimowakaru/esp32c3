@@ -4,7 +4,7 @@ HTMLコンテンツ LEDの輝度制御
                                           Copyright (c) 2016-2021 Wataru KUNINO
 *******************************************************************************/
 
-#define _html_size 567 + 8
+#define _html_size 567 + 32
 
 String getHtml(int target){
     /*
