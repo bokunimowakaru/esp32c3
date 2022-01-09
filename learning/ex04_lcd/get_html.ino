@@ -3,7 +3,7 @@ HTMLコンテンツ 液晶
 
                                           Copyright (c) 2016-2019 Wataru KUNINO
 *******************************************************************************/
-#define _html_size 2048
+#define _html_size 777 + 32 + 32 + 64
 
 String getHtml(String rx){
     char html[_html_size],s[65],s_ip[16];
@@ -40,7 +40,9 @@ String getHtml(String rx){
     strcat(html,"</form>");
     strcat(html,"</body>");
     strcat(html,"</html>");
-    Serial.println("sizeof(html)=" + String(strlen(html)+1));
+    // Serial.println("sizeof(html)=" + String(strlen(html)+1));
+    // 00:59:00.291 -> sizeof(html)=777
+    // 00:59:00.291 -> ｴﾚｷｼﾞｬｯｸIoT CQpb
     return String(html);
 
     /*
