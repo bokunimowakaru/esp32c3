@@ -3,7 +3,7 @@ HTMLコンテンツ 液晶
 
                                           Copyright (c) 2016-2019 Wataru KUNINO
 *******************************************************************************/
-#define _html_size 567 + 32
+#define _html_size 2048
 
 String getHtml(String rx){
     char html[_html_size],s[65],s_ip[16];
