@@ -39,6 +39,7 @@ LINE用のトークンを設定すれば、LINEアプリに「ボタンが押さ
 #define PIN_LED 0                               // IO 0 に (通常の)LED を接続
 #define PIN_SW 1                                // IO1 にタクトスイッチを接続
 #define PIN_BTN 3                               // IO3 にボタンを接続(m5stamp)
+// #define PIN_BTN 9                            // IO9 にボタンを接続(m5stampU)
 #define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
 #define SSID "1234ABCD"                         // 無線LANアクセスポイント SSID
