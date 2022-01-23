@@ -40,6 +40,8 @@ LINE用のトークンを設定すれば、LINEアプリに「ボタンが押さ
 #define PIN_SW 1                                // IO1 にタクトスイッチを接続
 #define PIN_BTN 3                               // IO3 にボタンを接続(m5stamp)
 // #define PIN_BTN 9                            // IO9 にボタンを接続(m5stampU)
+// ご注意：M5Stamp C3Uの場合は、本体中央ボタンによる割り込み機能がサポートされていません。
+// E (480) gpio: GPIO 9 does not support deep sleep wakeup
 #define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
 #define SSID "1234ABCD"                         // 無線LANアクセスポイント SSID
