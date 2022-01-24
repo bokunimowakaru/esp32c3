@@ -1,35 +1,39 @@
 /*******************************************************************************
-Example 46 (=32+14): ESP32 Wi-Fi リモコン赤外線レシーバ
+Example 7: ESP32C3 Wi-Fi リモコン赤外線レシーバ
 赤外線リモコン信号を受信し、受信データをWi-Fi送信します。
 
-    GPIO 4(26番ピン)へIRセンサを接続
+    GPIO 0 へIRセンサを接続
 
-                                          Copyright (c) 2016-2019 Wataru KUNINO
+                                          Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
 #include <WiFiUdp.h>                        // UDP通信を行うライブラリ
 #define DATA_LEN_MAX 16                     // リモコンコードのデータ長(byte)
-#define PIN_IR_IN 4                         // GPIO 4(26番ピン) にIRセンサを接続
-#define PIN_LED 2                           // GPIO 2(24番ピン)にLEDを接続
+#define PIN_IR_IN 0                         // IO0 にIRセンサを接続
+#define PIN_LED_RGB 2                       // IO2 に WS2812を接続(m5stamp)
+// #define PIN_LED_RGB 8                    // IO8 に WS2812を接続(DevKitM)
 #define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
 #define PASS "password"                     // パスワード
-#define SENDTO "192.168.0.255"              // 送信先のIPアドレス
 #define PORT 1024                           // 送信のポート番号
 #define DEVICE "ir_in_1,"                   // デバイス名(5文字+"_"+番号+",")
 
+IPAddress IP_BROAD;                         // ブロードキャストIPアドレス
+
 void setup(){                               // 起動時に一度だけ実行する関数
-    pinMode(PIN_IR_IN, INPUT);              // IRセンサの入力ポートの設定
-    pinMode(PIN_LED,OUTPUT);                // LEDを接続したポートを出力に
+    ir_read_init(PIN_IR_IN);                // IRセンサの入力ポートの設定
+    led_setup(PIN_LED_RGB);                 // WS2812の初期設定(ポート設定)
     Serial.begin(115200);                   // 動作確認のためのシリアル出力開始
-    Serial.println("ESP32 eg.14 ir_in");    // 「Example 14」をシリアル出力表示
+    Serial.println("ESP32C3 eg.7 ir_in");   // タイトルをシリアル出力表示
     WiFi.mode(WIFI_STA);                    // 無線LANをSTAモードに設定
     WiFi.begin(SSID,PASS);                  // 無線LANアクセスポイントへ接続
     while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
-        delay(500);                         // 待ち時間処理
-        digitalWrite(PIN_LED,!digitalRead(PIN_LED));    // LEDの点滅
+        led((millis()/50) % 10);            // (WS2812)LEDの点滅
+        delay(50);                          // 待ち時間処理
     }
-    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル表示
+    IP_BROAD = WiFi.localIP();              // IPアドレスを取得
+    IP_BROAD[3] = 255;                      // ブロードキャストアドレスに
+    Serial.println(IP_BROAD);               // ブロードキャストアドレス表示
 }
 
 void loop(){
@@ -38,13 +42,13 @@ void loop(){
     int len,len8;                           // 信号長 len(bits),len8（bytes）
     byte i;
 
-    digitalWrite(PIN_LED,LOW);              // LEDを消灯状態に
+    led(0,20,0);                            // (WS2812)LEDを緑色で点灯
     len = ir_read(data, DATA_LEN_MAX, 255); // 赤外線信号を読み取る
     len8 = len / 8;                         // ビット長を8で割った値をlen8へ代入
     if(len%8) len8++;                       // 余りがあった場合に1バイトを加算
     if(len8>=2){                            // 2バイト以上の時に以下を実行
-        digitalWrite(PIN_LED,HIGH);         // LEDを点灯状態に
-        udp.beginPacket(SENDTO, PORT);      // UDP送信先を設定
+        led(20,0,20);                       // (WS2812)LEDを紫色で点灯
+        udp.beginPacket(IP_BROAD, PORT);    // UDP送信先を設定
         udp.print(DEVICE);                  // デバイス名を送信
         udp.print(len);                     // 信号長を送信
         Serial.print(len);                  // 信号長をシリアル出力表示
