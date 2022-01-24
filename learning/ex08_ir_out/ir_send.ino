@@ -47,18 +47,18 @@ void ir_flash(byte times){
 	while(times){
 		times--;
 		delayMicroseconds(FLASH_ON);
-		digitalWrite(PIN_IR_OUT, IR_OUT_ON);
+		digitalWrite(_PIN_IR_OUT, IR_OUT_ON);
 		delayMicroseconds(FLASH_OFF);
-		digitalWrite(PIN_IR_OUT, IR_OUT_OFF);
+		digitalWrite(_PIN_IR_OUT, IR_OUT_OFF);
 	}
 }
 void ir_wait(byte times){
 	while(times){
 		times--;
 		delayMicroseconds(FLASH_ON);
-		digitalWrite(PIN_IR_OUT, IR_OUT_OFF);
+		digitalWrite(_PIN_IR_OUT, IR_OUT_OFF);
 		delayMicroseconds(FLASH_OFF);
-		digitalWrite(PIN_IR_OUT, IR_OUT_OFF);
+		digitalWrite(_PIN_IR_OUT, IR_OUT_OFF);
 	}
 }
 
