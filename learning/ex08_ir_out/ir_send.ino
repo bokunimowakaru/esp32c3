@@ -27,7 +27,7 @@
 #define NEC			1
 #define SIRC		2
 
-// #define DEBUG_ARDUINO
+#define DEBUG_ARDUINO
 
 int _PIN_IR_OUT = 2;                 // 赤外線LEDの接続ポート
 
@@ -37,8 +37,8 @@ void ir_send_init(void){
 }
 
 void ir_send_init(int port){
-	pinMode(_PIN_IR_OUT, OUTPUT);
-	digitalWrite(_PIN_IR_OUT, IR_OUT_OFF);
+	pinMode(port, OUTPUT);
+	digitalWrite(port, IR_OUT_OFF);
 	_PIN_IR_OUT = port;
 }
 
@@ -139,6 +139,9 @@ void ir_send(byte *data, const byte data_len, const byte ir_type ){
 	byte b;
 	
 	if(data_len<16) return;
+
+    portMUX_TYPE mutex = portMUX_INITIALIZER_UNLOCKED;  // 排他制御用
+    portENTER_CRITICAL_ISR(&mutex);             // 割り込みの禁止
 	switch( ir_type ){
 		case NEC:
 			ir_flash( 8 * FLASH_NEC_TIMES );	// send 'SYNC_H'
@@ -206,4 +209,5 @@ void ir_send(byte *data, const byte data_len, const byte ir_type ){
 			ir_flash( FLASH_AEHA_TIMES );		// send 'stop'
 			break;
 	}
+    portEXIT_CRITICAL_ISR(&mutex);              // 割り込み許可
 }
