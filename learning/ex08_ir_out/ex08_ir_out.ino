@@ -43,6 +43,7 @@ void setup(){                               // 起動時に一度だけ実行す
     }
     IP_BROAD = WiFi.localIP();              // IPアドレスを取得
     IP_BROAD[3] = 255;                      // ブロードキャストアドレスに
+    led(0,20,0);                            // (WS2812)LEDを緑色で点灯
     server.begin();                         // サーバを起動する
     udp.begin(PORT);                        // UDP通信御開始
     Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル表示
@@ -61,7 +62,6 @@ void loop(){
     int postL=96;                           // POSTデータ長
 
     /* 赤外線受信・UDP送信処理 */
-    led(0,20,0);                            // (WS2812)LEDを緑色で点灯
     d_len=ir_read(d,DATA_LEN_MAX,255);      // 赤外線信号を読み取る
     if(d_len>=16){                          // 16ビット以上の時に以下を実行
         led(40,0,0);                        // (WS2812)LEDを赤色で点灯
@@ -75,6 +75,8 @@ void loop(){
         udp.endPacket();                    // UDP送信の終了(実際に送信する)
         memcpy(D,d,DATA_LEN_MAX);           // データ変数dを変数Dにコピーする
         D_LEN=d_len;                        // データ長d_lenをD_LENにコピーする
+        delay(500);
+        led(0,20,0);                        // (WS2812)LEDを緑色で点灯
     }
     /* TCPサーバ・UDP受信処理 */
     client = server.available();            // 接続されたクライアントを生成
