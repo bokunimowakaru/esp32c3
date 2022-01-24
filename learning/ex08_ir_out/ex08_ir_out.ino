@@ -64,7 +64,7 @@ void loop(){
     led(0,20,0);                            // (WS2812)LEDを緑色で点灯
     d_len=ir_read(d,DATA_LEN_MAX,255);      // 赤外線信号を読み取る
     if(d_len>=16){                          // 16ビット以上の時に以下を実行
-        led(0,0,0);                         // (WS2812)LEDを赤色で点灯
+        led(40,0,0);                        // (WS2812)LEDを赤色で点灯
         udp.beginPacket(IP_BROAD, PORT);    // UDP送信先を設定
         udp.print(DEVICE);                  // デバイス名を送信
         udp.print(d_len);                   // 信号長を送信
