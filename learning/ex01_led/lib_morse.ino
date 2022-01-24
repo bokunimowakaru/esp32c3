@@ -66,7 +66,7 @@ void morse(int output, int time, const char *str) {
         if(pattern){
             for (j=0; j<strlen(pattern); j++) {
                 led(10);
-                digitalWrite(output, HIGH);
+                if(output >= 0) digitalWrite(output, HIGH);
                 if(pattern[j] == '.') {
                     morse_delay(time);
                     Serial.print('.');
@@ -76,7 +76,7 @@ void morse(int output, int time, const char *str) {
                     Serial.print('_');
                 }
                 led(0);
-                digitalWrite(output, LOW);
+                if(output >= 0) digitalWrite(output, LOW);
                 morse_delay(time);
             }
             morse_delay(2 * time);

@@ -12,7 +12,6 @@
 赤外線リモコン信号を送信します。
 */
 
-#define PIN_IR_OUT	2				// 赤外線LEDの接続ポート
 #define IR_OUT_OFF	LOW				// 赤外線LED非発光時の出力値
 #define IR_OUT_ON	HIGH			// 赤外線LED発光時の出力値
 #define DATA_SIZE	16				// データ長(byte),4の倍数、16以上
@@ -30,9 +29,17 @@
 
 // #define DEBUG_ARDUINO
 
+int _PIN_IR_OUT = 2;                 // 赤外線LEDの接続ポート
+
 void ir_send_init(void){
-	pinMode(PIN_IR_OUT, OUTPUT);
-	digitalWrite(PIN_IR_OUT, IR_OUT_OFF);
+	pinMode(_PIN_IR_OUT, OUTPUT);
+	digitalWrite(_PIN_IR_OUT, IR_OUT_OFF);
+}
+
+void ir_send_init(int port){
+	pinMode(_PIN_IR_OUT, OUTPUT);
+	digitalWrite(_PIN_IR_OUT, IR_OUT_OFF);
+	_PIN_IR_OUT = port;
 }
 
 /* 赤外線ＬＥＤ点滅用 */

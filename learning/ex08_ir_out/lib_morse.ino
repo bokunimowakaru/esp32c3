@@ -1,16 +1,16 @@
 /*******************************************************************************
-モールス
-
-                                           Copyright (c) 2016-2019 Wataru KUNINO
+モールス for RGB LED WS2812
+要lib_led.ino
+                                           Copyright (c) 2016-2021 Wataru KUNINO
 *******************************************************************************/
 
 /*
 本スケッチは下記からダウンロードしたものを改変して作成しました。
 
 http://darashi.net/2012/02/23/arduino-hello-world.html
-HELLO WORLD from Arduino 
+HELLO WORLD from Arduino
 Feb 23 2012.
-darashi/hello.c 
+darashi/hello.c
 
 Yoji Shidara (https://github.com/darashi)
 */
@@ -65,16 +65,18 @@ void morse(int output, int time, const char *str) {
         if ( *c == '.') pattern=morse_dot;
         if(pattern){
             for (j=0; j<strlen(pattern); j++) {
-                digitalWrite(output, HIGH);
+                led(10);
+                if(output >= 0) digitalWrite(output, HIGH);
                 if(pattern[j] == '.') {
                     morse_delay(time);
                     Serial.print('.');
-                } 
+                }
                 else {
                     morse_delay(3 * time);
                     Serial.print('_');
                 }
-                digitalWrite(output, LOW);
+                led(0);
+                if(output >= 0) digitalWrite(output, LOW);
                 morse_delay(time);
             }
             morse_delay(2 * time);
@@ -98,7 +100,7 @@ void loop() {
 void morseIp(int output, int time, uint32_t ip){
     byte i,j;
     char s[17];
-    
+
     sprintf(s,"%d.%d.%d.%d",
         ip & 255,
         ip>>8 & 255,
@@ -111,7 +113,7 @@ void morseIp(int output, int time, uint32_t ip){
 void morseIp0(int output, int time, uint32_t ip){
     byte i,j;
     char s[17];
-    
+
     sprintf(s,".%i",
         ip>>24
     );

@@ -9,7 +9,6 @@
                                https://bokunimo.net/bokunimowakaru/
 *********************************************************************/
 
-#define PIN_IR_IN 4                 // IO 4(10番ピン) にIRセンサを接続
 #define IR_IN_OFF	1				// 赤外線センサ非受光時の入力値
 #define IR_IN_ON	0				// 赤外線センサ受光時の入力値
 #define SYNC_WAIT	2*16*470		// 待ち時間[us] (15ms) ※intの範囲
@@ -26,6 +25,7 @@
 
 //	#define DEBUG
 //	#define DEBUG_ARDUINO
+int _PIN_IR_IN = 4;                 // IO 4(10番ピン) にIRセンサを接続
 
 /*
 int micros_prev,micros_sec=0;
@@ -56,7 +56,12 @@ byte digitalRead(){
 */
 
 void ir_read_init(void){
-	pinMode(PIN_IR_IN, INPUT);
+	pinMode(_PIN_IR_IN, INPUT);
+}
+
+void ir_read_init(int port){
+	pinMode(port, INPUT);
+	_PIN_IR_IN = port;
 }
 
 /* シンボル読取り*/
