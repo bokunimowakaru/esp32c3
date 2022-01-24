@@ -1,11 +1,16 @@
 /*******************************************************************************
-Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ版
+Practice esp32 pir 【Wi-Fi 人感センサ子機】ディープスリープ版
 
-・回路図は「超特急Web接続! ESPマイコン・プログラム全集」 P.75を参照し、以下留意
-・人感センサの出力インピーダンスが低い。FETかトランジスタで反転させIO 10に入力
+M5Stamp C3/C3U + PIR Unit
+人感センサ PIR Unit が人体などの動きを検知すると、ディープ・スリープから復帰し、
+UDPブロードキャストでセンサ値を送信します。
+
+「超特急Web接続! ESPマイコン・プログラム全集」 P.75の回路を使用する場合は、
+以下留意してください。
+・人感センサの出力インピーダンスが低い。FETかトランジスタで反転させてから IO 0 に入力する
 ・検知時にHighとなるときはPIR_XORを0に、LowになるときはPIR_XORを1に設定する
 
-                                           Copyright (c) 2016-2019 Wataru KUNINO
+                                           Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 #include <WiFi.h>                               // ESP32用WiFiライブラリ
 #include <WiFiUdp.h>                            // UDP通信を行うライブラリ
@@ -26,7 +31,7 @@ Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ�
  *****************************************************************************/
 #define LINE_TOKEN  "your_token"                // LINE Notify トークン★要設定
 
-#define PIN_PIR 1                               // IO1にセンサ(人感/ドア)を接続
+#define PIN_PIR 0                               // IO0にセンサ(人感/ドア)を接続
 #define PIN_LED_RGB 2                           // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                        // IO8 に WS2812を接続(DevKitM)
 #define SSID "1234ABCD"                         // 無線LANアクセスポイントSSID
@@ -34,7 +39,7 @@ Practice esp32 14 pir 【Wi-Fi 人感センサ子機】ディープスリープ�
 #define PORT 1024                               // 受信ポート番号
 #define DEVICE "pir_s_1,"                       // 人感センサ時デバイス名
 // #define DEVICE "rd_sw_1,"                    // ドアセンサ時デバイス名
-#define PIR_XOR 1                               // センサ送信値の論理反転の有無
+#define PIR_XOR 0                               // センサ送信値の論理反転の有無
 
 RTC_DATA_ATTR boolean PIR;                      // pir値のバックアップ保存用
 boolean pir;                                    // 人感センサ値orドアセンサ状態
@@ -111,7 +116,7 @@ void sleep(){                                   // スリープ実行用の関�
     led_off();                                  // (WS2812)LEDの消灯
     Serial.println("Sleep...");                 // 「Sleep」をシリアル出力表示
     delay(10);                                  // 待ち時間処理
-    uint64_t pin = 1ULL << PIN_SW;              // 起動用IOポートのマスク作成
+    uint64_t pin = 1ULL << PIN_PIR;             // 起動用IOポートのマスク作成
     esp_deep_sleep_enable_gpio_wakeup(pin, pir_wake); // スリープ解除設定
     esp_deep_sleep_start();                     // Deep Sleepモードへ移行
 }
