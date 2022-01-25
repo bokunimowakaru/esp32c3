@@ -7,6 +7,8 @@ Example 51 (=32+19): ESP32 Wi-Fi コンシェルジェ リモコン担当(赤外
 
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
 #include <WiFiUdp.h>                        // UDP通信を行うライブラリ
+#include <WebServer.h>                      // HTTPサーバ用ライブラリ
+
 #define TIMEOUT 20000                       // タイムアウト 20秒
 #define DATA_LEN_MAX 16                     // リモコンコードのデータ長(byte)
 #define PIN_IR_IN 0                         // IO0 に IR センサを接続
@@ -24,15 +26,35 @@ Example 51 (=32+19): ESP32 Wi-Fi コンシェルジェ リモコン担当(赤外
 IPAddress IP_BROAD;                         // ブロードキャストIPアドレス
 
 WiFiUDP udp;                                // UDP通信用のインスタンスを定義
-WiFiServer server(80);                      // Wi-Fiサーバ(ポート80=HTTP)定義
+WebServer server(80);                       // Webサーバ(ポート80=HTTP)定義
 byte D[DATA_LEN_MAX];                       // 保存用・リモコン信号データ
 int D_LEN;                                  // 保存用・リモコン信号長（bit）
 int IR_TYPE=AEHA;                           // リモコン方式
 
+void handleRoot(){
+    char s[97];                             // 文字列変数を定義 97バイト96文字
+    Serial.println("Connected");            // 接続されたことをシリアル出力表示
+    if(server.hasArg("TYPE")){              // 引数TYPEが含まれていた時
+        IR_TYPE = server.arg("TYPE").toInt(); // 引数TYPEの値をIR_TYPEへ
+    }
+    if(server.hasArg("IR")){                // 引数IRが含まれていた時
+        String rx = server.arg("IR");       // 引数IRの値を取得し変数rxへ代入
+        Serial.println(rx);
+        rx.toCharArray(s,97);
+        trUri2txt(s);
+        Serial.println(s);
+        D_LEN=ir_txt2data(D,DATA_LEN_MAX,s); // 受信データsをリモコン信号に変換
+        ir_send(D,D_LEN,IR_TYPE);
+    }
+    ir_data2txt(s, 97, D, D_LEN);           // 信号データDを表示文字sに変換
+    String tx = getHtml(s,D_LEN,IR_TYPE);   // HTMLコンテンツを取得
+    server.send(200, "text/html", tx);      // HTMLコンテンツを送信
+}
+
 void setup(){                               // 起動時に一度だけ実行する関数
+    led_setup(PIN_LED_RGB);                 // WS2812の初期設定(ポート設定)
     ir_read_init(PIN_IR_IN);                // IRセンサの入力ポートの設定
     ir_send_init(PIN_IR_OUT);               // IR LEDの出力ポートの設定
-    led_setup(PIN_LED_RGB);                 // WS2812の初期設定(ポート設定)
     Serial.begin(115200);                   // 動作確認のためのシリアル出力開始
     Serial.println("ESP32C3 eg.8 ir_rc");   // タイトルをシリアル出力表示
     WiFi.mode(WIFI_STA);                    // 無線LANをSTAモードに設定
@@ -41,25 +63,22 @@ void setup(){                               // 起動時に一度だけ実行す
         led((millis()/50) % 10);            // (WS2812)LEDの点滅
         delay(50);                          // 待ち時間処理
     }
+    morseIp0(-1,100,WiFi.localIP());        // IPアドレス終値をモールス信号出力
+    server.on("/", handleRoot);             // HTTP接続時のコールバック先を設定
+    server.begin();                         // Web サーバを起動する
+    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル表示
     IP_BROAD = WiFi.localIP();              // IPアドレスを取得
     IP_BROAD[3] = 255;                      // ブロードキャストアドレスに
-    led(0,20,0);                            // (WS2812)LEDを緑色で点灯
-    server.begin();                         // サーバを起動する
     udp.begin(PORT);                        // UDP通信御開始
-    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル表示
-    morseIp0(-1,100,WiFi.localIP());        // IPアドレス終値をモールス信号出力
+    led(0,20,0);                            // (WS2812)LEDを緑色で点灯
 }
 
 void loop(){
-    WiFiClient client;                      // Wi-Fiクライアントの定義
     byte d[DATA_LEN_MAX];                   // リモコン信号データ
     int d_len;                              // リモコン信号長（bit）
-    char c;                                 // 文字変数を定義
     char s[97];                             // 文字列変数を定義 97バイト96文字
-    int len=0;                              // 文字列等の長さカウント用の変数
-    int t=0;                                // 待ち受け時間のカウント用の変数
-    int postF=0;                            // POSTフラグ(0:未 1:POST 2:BODY)
-    int postL=96;                           // POSTデータ長
+
+    server.handleClient();                  // クライアントからWebサーバ呼出
 
     /* 赤外線受信・UDP送信処理 */
     d_len=ir_read(d,DATA_LEN_MAX,255);      // 赤外線信号を読み取る
@@ -78,74 +97,18 @@ void loop(){
         delay(500);
         led(0,20,0);                        // (WS2812)LEDを緑色で点灯
     }
-    /* TCPサーバ・UDP受信処理 */
-    client = server.available();            // 接続されたクライアントを生成
-    if(!client){                            // TCPクライアントが無かった場合
-        d_len=udp.parsePacket();            // UDP受信長を変数d_lenに代入
-        if(d_len==0)return;                 // TCPとUDPが未受信時にloop()先頭へ
-        memset(s, 0, 97);                   // 文字列変数sの初期化(97バイト)
-        udp.read(s, 96);                    // UDP受信データを文字列変数sへ代入
-        if(
-            len>6 && (                      // データ長が6バイトより大きくて、
-                strncmp(s,"ir_rc_",6)==0 || // 受信データが「ir_rc_」
-                strncmp(s,"ir_in_",6)==0    // または「ir_in_」で始まる時
-            )
-        ){
-            D_LEN=ir_txt2data(D,DATA_LEN_MAX,&s[6]);
-        }                                   // 受信TXTをデータ列に変換
-        return;                             // 非接続の時にloop()の先頭に戻る
-    }
-    Serial.println("Connected");            // 接続されたことをシリアル出力表示
-    len=0;
-    while(client.connected()){              // 当該クライアントの接続状態を確認
-        if(client.available()){             // クライアントからのデータを確認
-            t=0;                            // 待ち時間変数をリセット
-            c=client.read();                // データを文字変数cに代入
-            if(c=='\n'){                    // 改行を検出した時
-                if(postF==0){               // ヘッダ処理
-                    if (len>11 && strncmp(s,"GET /?TYPE=",11)==0){
-                        IR_TYPE=atoi(&s[11]);
-                        break;              // 解析処理の終了
-                    }else if (len>5 && strncmp(s,"GET /",5)==0){
-                        break;              // 解析処理の終了
-                    }else if(len>6 && strncmp(s,"POST /",6)==0){
-                        postF=1;            // POSTのBODY待ち状態へ
-                    }
-                }else if(postF==1){
-                    if(len>16 && strncmp(s,"Content-Length: ",16)==0){
-                        postL=atoi(&s[16]); // 変数postLにデータ値を代入
-                    }
-                }
-                if( len==0 ) postF++;       // ヘッダの終了
-                len=0;                      // 文字列長を0に
-            }else if(c!='\r' && c!='\0'){
-                s[len]=c;                   // 文字列変数に文字cを追加
-                len++;                      // 変数lenに1を加算
-                s[len]='\0';                // 文字列を終端
-                if(len>=96) len=95;         // 文字列変数の上限
-            }
-            if(postF>=2){                   // POSTのBODY処理
-                if(postL<=0){               // 受信完了時
-                    if(len>3 && strncmp(s,"IR=",3)==0){
-                        trUri2txt(&s[3]);
-                        D_LEN=ir_txt2data(D,DATA_LEN_MAX,&s[3]);
-                        ir_send(D,D_LEN,IR_TYPE);
-                        break;              // 受信TXTをデータ列に変換
-                    }
-                }                           // BODYが「IR=」の場合に解析を終了
-                postL--;                    // 受信済POSTデータ長の減算
-            }
-        }
-        t++;                                // 変数tの値を1だけ増加させる
-        if(t>TIMEOUT) break; else delay(1); // TIMEOUTに到達したらwhileを抜ける
-    }
-    delay(1);                               // クライアント側の応答待ち時間
-    if(client.connected()){                 // 当該クライアントの接続状態を確認
-        if(D_LEN==0)strcpy(s,"データ未受信");
-        ir_data2txt(s,96,D,D_LEN);
-        html(client,s,D_LEN,IR_TYPE,WiFi.localIP());    // HTMLコンテンツを出力
-    }                                       // 負のときは-100を掛けて出力
-    client.flush();                         // ESP32用 ERR_CONNECTION_RESET対策
-    client.stop();                          // クライアントの切断
-    Serial.println("Disconnected");         // シリアル出力表示
+    /*
+    d_len=udp.parsePacket();                // UDP受信長を変数d_lenに代入
+    if(d_len==0)return;                     // TCPとUDPが未受信時にloop()先頭へ
+    memset(s, 0, 97);                       // 文字列変数sの初期化(97バイト)
+    udp.read(s, 96);                        // UDP受信データを文字列変数sへ代入
+    if(
+        d_len>6 && (                        // データ長が6バイトより大きくて、
+            strncmp(s,"ir_rc_",6)==0 ||     // 受信データが「ir_rc_」
+            strncmp(s,"ir_in_",6)==0        // または「ir_in_」で始まる時
+        )
+    ){
+        D_LEN=ir_txt2data(D,DATA_LEN_MAX,&s[8]);
+    }                                       // 受信TXTをデータ列に変換
+    */
 }
