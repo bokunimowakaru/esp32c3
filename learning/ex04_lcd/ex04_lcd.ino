@@ -7,6 +7,8 @@ HTTPによるWebサーバ機能搭載 Wi-FiコンシェルジェがLCDを制御�
         AQM0802 SDAポート GPIO 1
         AQM0802 SCLポート GPIO 0
         設定方法＝lcdSetup(表示xサイズ,表示yサイズ,SDAポート番号,SCLポート番号)
+
+M5Stamp C3, M5Stamp C3U に対応
                         
                                           Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/

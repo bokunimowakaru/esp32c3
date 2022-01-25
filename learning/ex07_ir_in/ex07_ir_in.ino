@@ -4,6 +4,8 @@ Example 7: ESP32C3 Wi-Fi リモコン赤外線レシーバ
 
     GPIO 0 へIRセンサを接続
 
+M5Stamp C3 or M5Stamp C3U + IR Unit に対応
+
                                           Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 

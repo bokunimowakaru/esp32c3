@@ -6,6 +6,8 @@ Example 5: ESP32C3 (IoTセンサ) Wi-Fi 温湿度計 SENSIRION製 SHT31/SHT35 �
         SHT31/SHT35 SDAポート GPIO 1
         SHT31/SHT35 SCLポート GPIO 0    設定方法＝shtSetup(SDA,SCL)
 
+M5Stamp C3, M5Stamp C3U に対応
+
                                           Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 
