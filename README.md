@@ -4,10 +4,10 @@ Example code for ESP32-C3, written for Arduino IDE
 ## 本コンテンツの最新版とダウンロード方法  
 
     最新版の保存先  
-    - https://bokunuimo.net/git/esp32c3/
+    - https://bokunimo.net/git/esp32c3/
     
     ダウンロード方法(GitHubから)
-    - git clone https://bokunuimo.net/git/esp32c3/
+    - git clone https://bokunimo.net/git/esp32c3/
 
 ## learning  
 M5Stamp C3, M5Stamp C3U を使った 無線IO制御プログラミング学習用コンテンツです。  
