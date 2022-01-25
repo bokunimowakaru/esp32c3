@@ -4,7 +4,7 @@ Example 8 : ESP32C3 Wi-Fi コンシェルジェ リモコン担当(赤外線リ�
 
 M5Stamp C3 or M5Stamp C3U + IR Unit に対応
 
-                                          Copyright (c) 2016-2019 Wataru KUNINO
+                                          Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
