@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-# Example 39 Raspberry Pi によるホームネットワーク i.myMimamoriHome
-#                                         Copyright (c) 2016-2019 Wataru KUNINO
+# Raspberry Pi によるホームネットワーク i.myMimamoriHome
+#                                         Copyright (c) 2016-2022 Wataru KUNINO
 #
 # IoT人感センサとIoT温度センサを用い、在室中に28℃以上または15℃以下となった時に
 # エアコンの運転を開始する。
+# また、赤外線リモコンセンサを用い、テレビの操作を検出したときに在室と判断する。
+#
+# 最新版はこちら：
+# https://bokunimo.net/git/myMimamori/blob/master/srv_myhome.py
 
 #【接続図】
 #           [IoTボタン]----------------
 #                                     ↓
 #           [IoT人感センサ]-----------・
+#                                     ↓
+#           [IoT赤外線リモコン]-------・
 #                                     ↓
 #           [IoT温度センサ] ------> [本機] ------> エアコン制御
 #                                     ↓
@@ -63,20 +69,50 @@ MAIL_ID   = '************@gmail.com'    ## 要変更 ##    # GMailのアカウ�
 MAIL_PASS = '************'              ## 要変更 ##    # パスワード
 MAILTO    = 'watt@bokunimo.net'         ## 要変更 ##    # メールの宛先
 
-ip_chime  = '192.168.0.5'               ## 要変更 ##    # IoTチャイム,IPアドレス
+ip_chime  = '192.168.0.XXX'             ## 要変更 ##    # IoTチャイム,IPアドレス
+ip_irrc   = '192.168.0.XXX'             ## 要変更 ##    # リモコン送信機アドレス
+
+LINE_TOKEN= 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                                            # ↑ここにLINEで取得したTOKENを入力
+'''
+　※LINEに送信したい場合は、お手持ちのLINEアカウントの LINE Notify用のトークンが
+　　必要です。以下の手順で取得してください。
+    1. https://notify-bot.line.me/ へアクセス
+    2. 右上のアカウントメニューから「マイページ」を選択
+    3. アクセストークンの発行で「トークンを発行する」を選択
+    4. トークン名「raspi」（任意）を入力
+    5. 送信先のトークルームを選択する(「1:1でLINE Notifyから通知を受け取る」等)
+    6. [発行する]ボタンでトークンが発行される
+    7. [コピー]ボタンでクリップボードへコピー
+    8. 下記のLINE_TOKENに貼り付け
+'''
 
 ROOM      = ['1','2','3']                               # 部屋番号(デバイスSFX)
 ROOM_STAY = None                                        # 在室状態
 ROOM_RC   = False                                       # 運転フラグ
 ALLOWED_TEMP  = [28,15]  #(℃)                          # 冷房／暖房自動運転温度
 REED=1                                                  # リード極性ON検出0,OFF1
-IR_TYPE   = 'AEHA'                                      # 方式 AEHA,NEC,SIRC
-AC_ON  = "AA,5A,CF,10,00,11,20,3F,18,B0,00,F4,B1"       # エアコン電源入コマンド
-AC_OFF = "AA,5A,CF,10,00,21,20,3F,18,B0,00,F4,81"       # エアコン電源切コマンド
 MON_INTERVAL  = 1 #(分)                                 # 監視処理の実行間隔
 
-sensors = ['pir_s','rd_sw','temp.','temp0','humid','press','envir'] # 対応センサ
-temp_lv = [ALLOWED_TEMP[0], ALLOWED_TEMP[0]+2 , ALLOWED_TEMP[0]+4 ] # 警告レベル
+# 赤外線リモコンに関する情報を設定してください。
+# リモコン方式IR_TYPEには、AEHA(家製協),NEC,SIRC(ソニー)のいずれかを設定し、
+# AC_ONとAC_OFFには、エアコンの赤外線リモコンのコードを、RC_CODEにはテレビの
+# リモコン・コードを設定します。RC_CODEの先頭の値はコード長(ビット)です。
+# ここでは48ビットでかつ先頭3バイトがAA,5A,8Fだったときにテレビであると判定
+# します（シャープ製のテレビ）。
+IR_TYPE  = 'AEHA'                                       # 方式 AEHA,NEC,SIRC
+AC_ON   = 'AA,5A,CF,10,00,11,20,3F,18,B0,00,F4,B1'      # エアコン電源入コマンド
+AC_OFF  = 'AA,5A,CF,10,00,21,20,3F,18,B0,00,F4,81'      # エアコン電源切コマンド
+RC_CODE = '48,AA,5A,8F'                                 # テレビのリモコン信号
+
+# 対応センサ
+sensors = ['pir_s','rd_sw','ir_rc','temp.','temp0','humid','press','envir']
+
+# うち温度を含むセンサ
+sensors_temp = ['temp.','temp0','humid','press','envir']
+
+# 警告レベル
+temp_lv = [ALLOWED_TEMP[0], ALLOWED_TEMP[0]+2 , ALLOWED_TEMP[0]+4 ]
 
 import socket                                           # IP通信用モジュール
 import urllib.request                                   # HTTP通信ライブラリ
@@ -85,7 +121,7 @@ import threading                                        # スレッド用ライ�
 import smtplib                                          # メール送信用ライブラリ
 from email.mime.text import MIMEText                    # メール形式ライブラリ
 import sys
-sys.path.append('../libs/ir_remote')
+sys.path.append('libs/ir_remote')
 import raspi_ir
 
 def mimamori(interval):
@@ -94,7 +130,7 @@ def mimamori(interval):
     global ROOM_RC, ROOM_STAY, TIME_SENS                # グローバル変数
     time_now = datetime.datetime.now()                  # 現在時刻の取得
     time_sens = TIME_SENS + datetime.timedelta(hours=2) # センサ受信時刻+2時間
-    if time_sens < time_now:                            # 2時間以上、受信なし
+    if time_now.minute == 0 and time_sens < time_now:   # 正時かつ2時間受信なし
         s = str(round((time_now - TIME_SENS).seconds / 60 / 60,1))
         msg = 'センサの信号が' + s + '時間ありません'   # メール本文の作成
         mail(MAILTO,'i.myMimamoriPi 警告',msg)          # メール送信関数を実行
@@ -110,6 +146,8 @@ def mimamori(interval):
                                                         # (スレッド動作確認用)
 
 def chime(level):                                       # チャイム
+    if ip_chime  == '192.168.0.XXX':                    # IPアドレス未設定時に
+        return                                          # 何もせずに戻る
     if level is None or level < 0 or level > 3:         # 範囲外の値の時に
         return                                          # 何もせずに戻る
     url_s = 'http://' + ip_chime                        # アクセス先
@@ -126,6 +164,23 @@ def chime(level):                                       # チャイム
             print('URLError :',url_s)                   # エラー表示
 
 def mail(att, subject, text):                           # メール送信用関数
+
+    # LINE送信部
+    if LINE_TOKEN != 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx':
+        url_s = 'https://notify-api.line.me/api/notify' # LINE アクセス先
+        head = {'Authorization':'Bearer ' + LINE_TOKEN,
+                'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'};
+        body = 'message=件名:' + subject + '\n' + text
+        print(body.replace('\n',', '))                  # メッセージを表示
+        post = urllib.request.Request(url_s, body.encode(), head)
+        try:                                            # 例外処理の監視を開始
+            urllib.request.urlopen(post)                # HTTPアクセスを実行
+        except Exception as e:                          # 例外処理発生時
+            print(e,url_s)                              # エラー内容と変数url_s表示
+
+    # メール送信部
+    if MAIL_PASS == '************':                     # メール未設定時
+        return                                          # 以下を実行しない
     try:
         mime = MIMEText(text.encode(), 'plain', 'utf-8')# TEXTをMIME形式に変換
         mime['From'] = MAIL_ID                          # 送信者を代入
@@ -146,11 +201,20 @@ def aircon(onoff):                                      # エアコン制御
         code = AC_ON.split(',')                         # エアコンをONに
     else:                                               # Falseのとき
         code = AC_OFF.split(',')                        # エアコンをOFFに
-    print('RC, Conditioner,',code)                      # 送信するリモコン信号を表示
-    try:
-        raspiIr.output(code)                            # リモコンコードを送信
-    except ValueError as e:                             # 例外処理発生時(アクセス拒否)
-        print('ERROR:raspiIr,',e)                       # エラー内容表示
+    if ip_irrc == '192.168.0.XXX':                      # IPアドレスが未設定のとき
+        try:
+            print('RC, Conditioner,',code)              # 送信するリモコン信号を表示
+            raspiIr.output(code)                        # リモコンコードを送信
+        except ValueError as e:                         # 例外処理発生時(アクセス拒否)
+            print('ERROR:raspiIr,',e)                   # エラー内容表示
+    else:                                               # IPアドレスが設定されている時
+        url_s = 'http://' + ip_irrc                     # アクセス先
+        s = '/?IR=' + str(len(code) * 8) + ',' + ','.join(code) # 送信信号を変数sへ
+        print('RC, Conditioner,',url_s + s)             # 送信するURLを表示
+        try:
+            urllib.request.urlopen(url_s + s)           # Wi-Fiリモコン送信機に送信
+        except urllib.error.URLError:                   # 例外処理発生時
+            print('URLError :',url_s)                   # エラー表示
 
 def check_dev_name(s):                                  # デバイス名を取得
     if not s.isprintable():                             # 表示可能な文字列で無い
@@ -225,9 +289,15 @@ while sock:                                             # 永遠に繰り返す
         if dev[6] in ROOM:                              # 自室のセンサだったとき
             ROOM_STAY = now                             # 在室状態を更新
 
+    # 赤外線リモコンによるテレビ操作を検出
+    if dev[0:5] == 'ir_in' or dev[0:5] == 'ir_rc':      # 赤外線リモコンの場合
+        if dev[6] in ROOM:                              # 自室センサの時
+            if udp.upper().find(RC_CODE) >= 8:          # テレビの時
+                ROOM_STAY = now                         # 在室状態を更新
+
     # 温度センサ用の処理
     level = 0                                           # 温度超過レベル(低温=負
-    if dev[0:5] in sensors[2:]:                         # 対応センサの3番目以降
+    if dev[0:5] in sensors_temp:                        # 温度値を含むセンサの時
         if val <= ALLOWED_TEMP[1]:                      # 15℃以下のとき
             level = -1                                  # 負のレベル設定
         for temp in temp_lv:                            # 警告レベルを取得
@@ -252,7 +322,7 @@ while sock:                                             # 永遠に繰り返す
 
     ### 制御 ### 赤外線リモコン
     if acrc > 0:                                        # エアコン制御有効時
-        time_temp = TIME_TEMP + datetime.timedelta(minutes = 5 ** (3 - level))
+        time_temp = TIME_TEMP + datetime.timedelta(minutes = 5 ** (3 - acrc))
         if time_temp < now:
             msg = '室温が' + str(val) + '℃になりました'
             mail(MAILTO,'i.myMimamoriHome 警告レベル=' + str(level), msg)
