@@ -16,9 +16,12 @@
 #define IR_OUT_ON	HIGH			// 赤外線LED発光時の出力値
 #define DATA_SIZE	16				// データ長(byte),4の倍数、16以上
 
-#define FLASH_AEHA_TIMES	16	// シンボルの搬送波点滅回数（ＡＥＨＡ）
-#define FLASH_NEC_TIMES		22	// シンボルの搬送波点滅回数（ＮＥＣ）
-#define FLASH_SIRC_TIMES	24	// シンボルの搬送波点滅回数（ＳＩＲＣ）
+#define FLASH_AEHA_TIMES	17	// シンボルの搬送波点滅回数（ＡＥＨＡ）
+						//  16 -> 17 2022/1/30 ESP32C3 オーバヘッド!? 信号長10%短かかった
+#define FLASH_NEC_TIMES		23	// シンボルの搬送波点滅回数（ＮＥＣ）
+						//  22 -> 23 2022/1/30 ESP32C3 オーバヘッド!? 信号長5%短かかった
+#define FLASH_SIRC_TIMES	25	// シンボルの搬送波点滅回数（ＳＩＲＣ）
+						//  24 -> 25 2022/1/30 未確認だが同じ状況と考え、+1した
 #define FLASH_ON			11	// LED ON 期間 us (規格上 ON+OFFで 23 us)
 #define FLASH_OFF			11	// LED ON 期間 us (規格上 ON+OFFで 23 us)
 
