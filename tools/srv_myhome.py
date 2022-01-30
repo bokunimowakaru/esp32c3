@@ -96,14 +96,19 @@ MON_INTERVAL  = 1 #(分)                                 # 監視処理の実行
 
 # 赤外線リモコンに関する情報を設定してください。
 # リモコン方式IR_TYPEには、AEHA(家製協),NEC,SIRC(ソニー)のいずれかを設定し、
-# AC_ONとAC_OFFには、エアコンの赤外線リモコンのコードを、RC_CODEにはテレビの
-# リモコン・コードを設定します。RC_CODEの先頭の値はコード長(ビット)です。
-# ここでは48ビットでかつ先頭3バイトがAA,5A,8Fだったときにテレビであると判定
-# します（シャープ製のテレビ）。
+# AC_ONとAC_OFFには、エアコンの赤外線リモコンのコードを設定します。
 IR_TYPE  = 'AEHA'                                       # 方式 AEHA,NEC,SIRC
 AC_ON   = 'AA,5A,CF,10,00,11,20,3F,18,B0,00,F4,B1'      # エアコン電源入コマンド
 AC_OFF  = 'AA,5A,CF,10,00,21,20,3F,18,B0,00,F4,81'      # エアコン電源切コマンド
-RC_CODE = '48,AA,5A,8F'                                 # テレビのリモコン信号
+TV_CODE = '48,AA,5A,8F'                                 # テレビのリモコン信号
+'''
+　TV_CODEの設定方法：
+　シャープ製のテレビの場合は'48,AA,5A,8F'、パナソニック製のテレビの場合は、
+　'48,02,20,80'を設定してください。先頭の48は、リモコンのコード長（ビット）です。
+　ここでは48ビットすなわち6バイトを指定しました。続くAA,5A,8Aや02,20,80がリモコン
+　信号の先頭3バイトです。受信した6バイトの先頭3バイトが一致すれば、残る3バイトに
+　何が入っていてもテレビのリモコンであると判定します。
+'''
 
 # 対応センサ
 sensors = ['pir_s','rd_sw','ir_rc','temp.','temp0','humid','press','envir']
@@ -236,9 +241,27 @@ def get_val(s):                                         # データを数値に�
 TIME_TEMP = TIME_SENS = datetime.datetime.now() - datetime.timedelta(hours=1)
 mail(MAILTO,'i.myMimamoriHome','起動しました')          # メール送信
 
-print('Listening UDP port', 1024, '...', flush=True)    # ポート番号1024表示
-raspiIr = raspi_ir.RaspiIr(IR_TYPE, out_port=4)         # 赤外線リモコン,Port=4
+# 赤外線送信の初期化
+ir_types = ['AEHA','NEC','SIRC']
+if IR_TYPE not in ir_types:
+    print('IR_TYPE Error :',IR_TYPE)                    # エラー表示
+    exit()                                              # プログラムの終了
+if ip_irrc != '192.168.0.XXX':                          # IPアドレスが設定済の時
+    url_s = 'http://' + ip_irrc                         # アクセス先
+    s = '/?TYPE=' + str(ir_types.index(IR_TYPE))        # リモコン信号方式を設定
+    print('RC, Conditioner,',url_s + s)                 # 送信するURLを表示
+    try:
+        urllib.request.urlopen(url_s + s)               # Wi-Fiリモコン送信機に送信
+    except urllib.error.URLError:                       # 例外処理発生時
+        print('URLError :',url_s)                       # エラー表示
+else:                                                   # IP未設定時
+    raspiIr = raspi_ir.RaspiIr(IR_TYPE, out_port=4)     # 赤外線リモコン,Port=4
 
+# 見守りシステムの起動
+mimamori(MON_INTERVAL * 60)                             # 関数mimamoriを起動
+
+# UDP受信
+print('Listening UDP port', 1024, '...', flush=True)    # ポート番号1024表示
 try:
     sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)# ソケットを作成
     sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)    # オプション
@@ -246,7 +269,6 @@ try:
 except Exception as e:                                  # 例外処理発生時
     print('ERROR, Sock:',e)                             # エラー内容を表示
     exit()                                              # プログラムの終了
-mimamori(MON_INTERVAL * 60)                             # 関数mimamoriを起動
 
 while sock:                                             # 永遠に繰り返す
     try:
@@ -292,7 +314,7 @@ while sock:                                             # 永遠に繰り返す
     # 赤外線リモコンによるテレビ操作を検出
     if dev[0:5] == 'ir_in' or dev[0:5] == 'ir_rc':      # 赤外線リモコンの場合
         if dev[6] in ROOM:                              # 自室センサの時
-            if udp.upper().find(RC_CODE) >= 8:          # テレビの時
+            if udp.upper().find(TV_CODE) >= 8:          # テレビの時
                 ROOM_STAY = now                         # 在室状態を更新
 
     # 温度センサ用の処理
