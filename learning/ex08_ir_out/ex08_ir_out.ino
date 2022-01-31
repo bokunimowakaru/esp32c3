@@ -11,7 +11,6 @@ M5Stamp C3 or M5Stamp C3U + IR Unit に対応
 #include <WiFiUdp.h>                        // UDP通信を行うライブラリ
 #include <WebServer.h>                      // HTTPサーバ用ライブラリ
 
-#define TIMEOUT 20000                       // タイムアウト 20秒
 #define DATA_LEN_MAX 16                     // リモコンコードのデータ長(byte)
 #define PIN_IR_IN 0                         // IO0 に IR センサを接続
 #define PIN_IR_OUT 1                        // IO1 に IR LEDを接続
