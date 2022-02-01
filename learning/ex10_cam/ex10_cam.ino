@@ -23,30 +23,29 @@ Webサーバ機能を使って、カメラのシャッターを制御し、撮�
 #define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
 #define PASS "password"                     // パスワード
 
+HardwareSerial hardwareSerial1(1);          // カメラ接続用シリアルポートESP32C3
+
 WiFiServer server(80);                      // Wi-Fiサーバ(ポート80=HTTP)定義
 int size=0;                                 // 画像データの大きさ(バイト)
 int update=60;                              // ブラウザのページ更新間隔(秒)
 
-HardwareSerial hardwareSerial1(1);
-
 void setup(){ 
     lcdSetup(8,2);                          // 液晶の初期化(8桁×2行)
-    pinMode(PIN_CAM,OUTPUT);                // FETを接続したポートを出力に
-    digitalWrite(PIN_CAM,HIGH);                // FETをHIGH(OFF)にする
+    pinMode(PIN_CAM,OPEN_DRAIN);                // FETを接続したポートをオープンに
     Serial.begin(115200);                   // 動作確認用用のシリアル出力開始
     Serial.println("Example 20 cam");       // 「Example 20」をシリアル出力表示
     WiFi.mode(WIFI_STA);                    // 無線LANをSTAモードに設定
     WiFi.begin(SSID,PASS);                  // 無線LANアクセスポイントへ接続
-    delay(100);                             // カメラの起動待ち
     hardwareSerial1.begin(115200, SERIAL_8N1, 8, 7); 
-    digitalWrite(PIN_CAM,LOW);                // FETをLOW(ON)にする
-    delay(500);                             // カメラの起動待ち
-    lcdPrint("Camera  Initing");
+    pinMode(PIN_CAM,OUTPUT);                // FETを接続したポートを出力に
+    digitalWrite(PIN_CAM,LOW);              // FETをLOW(ON)にする
+    delay(100);                             // 電源の供給待ち
+    lcdPrint("Initializing");
     CamInitialize();                        // カメラの初期化コマンド
-    lcdPrint("Camera  Setting");
+    lcdPrint("Setting QVGA");
     CamSizeCmd(1);                          // 撮影サイズをQVGAに設定
     delay(4000);                            // 完了待ち(開始直後の撮影防止対策)
-    lcdPrint("Camera  Done");
+    lcdPrint("Waiting Wi-Fi");
     while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
         delay(500);                         // 待ち時間処理
     }
