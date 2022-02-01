@@ -26,7 +26,7 @@ http://www.seeedstudio.com/wiki/Grove_-_Serial_Camera_Kit
 #define PIC_FMT_CIF    5
 #define PIC_FMT_OCIF   3
 #define CAM_ADDR       0
-#define CAM_SERIAL     Serial
+#define CAM_SERIAL     hardwareSerial1
 
 #define PIC_FMT        PIC_FMT_VGA
 
