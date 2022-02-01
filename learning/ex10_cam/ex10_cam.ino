@@ -9,12 +9,11 @@ Webサーバ機能を使って、カメラのシャッターを制御し、撮�
 
     IO10 にPch-FETを接続
 
-                                          Copyright (c) 2016-2019 Wataru KUNINO
+                                          Copyright (c) 2016-2022 Wataru KUNINO
 *******************************************************************************/
 // HardwareSerial.h
 // void begin(unsigned long baud, uint32_t config=SERIAL_8N1, int8_t rxPin=-1, int8_t txPin=-1, bool invert=false, unsigned long timeout_ms = 20000UL, uint8_t rxfifo_full_thrhd = 112);
  
-
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
 #include <WiFiUdp.h>                        // UDP通信を行うライブラリ
 
