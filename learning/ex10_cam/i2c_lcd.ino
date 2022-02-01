@@ -9,8 +9,8 @@ Arduino ESP32 用 ソフトウェア I2C LCD ドライバ soft_i2c
 *******************************************************************************/
 
 #define I2C_lcd 0x3E							// LCD の I2C アドレス 
-#define PORT_SCL	22							// I2C SCLポート
-#define PORT_SDA	21							// I2C SDAポート
+#define PORT_SCL	0							// I2C SCLポート
+#define PORT_SDA	1							// I2C SDAポート
 #define	I2C_RAMDA	30							// I2C データシンボル長[us]
 #define GPIO_RETRY	50							// GPIO 切換え時のリトライ回数
 //	#define DEBUG								// デバッグモード
