@@ -4,8 +4,8 @@ Example 10: ESP32C3 Wi-Fi コンシェルジェ カメラ担当
 Webサーバ機能を使って、カメラのシャッターを制御し、撮影した写真を表示します。
 
     カメラ接続用
-    IO8 RX カメラ側はTXD端子(黄色)
     IO7 TX カメラ側はRXD端子(白色)
+    IO8 RX カメラ側はTXD端子(黄色)
 
     IO10 にPch-FETを接続
 
@@ -21,12 +21,29 @@ Webサーバ機能を使って、カメラのシャッターを制御し、撮�
 #define TIMEOUT 20000                       // タイムアウト 20秒
 #define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
 #define PASS "password"                     // パスワード
+#define PORT 1024                           // UDP送信先ポート番号
+#define DEVICE_CAM  "cam_a_1,"              // デバイス名(カメラ)
 
 HardwareSerial hardwareSerial1(1);          // カメラ接続用シリアルポートESP32C3
 
 WiFiServer server(80);                      // Wi-Fiサーバ(ポート80=HTTP)定義
+IPAddress   IP_LOCAL;                       // 本機のIPアドレス
+IPAddress   IP_BROAD;                       // ブロードキャストIPアドレス
 int size=0;                                 // 画像データの大きさ(バイト)
 int update=60;                              // ブラウザのページ更新間隔(秒)
+
+void sendUdp(String dev, String S){
+    WiFiUDP udp;                            // UDP通信用のインスタンスを定義
+    udp.beginPacket(IP_BROAD, PORT);        // UDP送信先を設定
+    udp.println(dev + S);
+    udp.endPacket();                        // UDP送信の終了(実際に送信する)
+    Serial.println("udp://" + IP_BROAD.toString() + ":" + PORT + " " + dev + S);
+    delay(200);                             // 送信待ち時間
+}
+
+void sendUdp_Fd(uint16_t fd_num){
+    sendUdp(DEVICE_CAM, String(fd_num) + ", http://" + IP_LOCAL.toString() + "/cam.jpg");
+}
 
 void setup(){ 
     lcdSetup(8,2,1,0);                      // LCD初期(X=8,Y=2,SDA=1,SCL=0)
@@ -48,9 +65,13 @@ void setup(){
     while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
         delay(500);                         // 待ち時間処理
     }
+    IP_LOCAL = WiFi.localIP();
+    IP_BROAD = IP_LOCAL;
+    IP_BROAD[3] = 255;
     server.begin();                         // サーバを起動する
-    lcdPrintIp(WiFi.localIP());             // 本機のIPアドレスを液晶に表示
-    Serial.println(WiFi.localIP());         // 本機のIPアドレスをシリアル表示
+    lcdPrintIp(IP_LOCAL);                   // 本機のIPアドレスを液晶に表示
+    Serial.println(IP_LOCAL);               // 本機のIPアドレスをシリアル表示
+    sendUdp_Fd(0);                          // 起動したことを知らせるUDP送信
 }
 
 void loop(){
