@@ -29,7 +29,7 @@ int size=0;                                 // 画像データの大きさ(バ�
 int update=60;                              // ブラウザのページ更新間隔(秒)
 
 void setup(){ 
-    lcdSetup(8,2);                          // 液晶の初期化(8桁×2行)
+    lcdSetup(8,2,1,0);                      // LCD初期(X=8,Y=2,SDA=1,SCL=0)
     pinMode(PIN_CAM,OPEN_DRAIN);            // FETを接続したポートをオープンに
     Serial.begin(115200);                   // 動作確認用用のシリアル出力開始
     Serial.println("Example 10 cam");       // 「Example 10」をシリアル出力表示

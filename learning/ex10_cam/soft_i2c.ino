@@ -4,17 +4,18 @@ Arduino ESP32 用 ソフトウェア I2C LCD ドライバ soft_i2c
 本ソースリストおよびソフトウェアは、ライセンスフリーです。(詳細は別記)
 利用、編集、再配布等が自由に行えますが、著作権表示の改変は禁止します。
 
-							 			Copyright (c) 2014-2019 Wataru KUNINO
+							 			Copyright (c) 2014-2022 Wataru KUNINO
 							 			https://bokunimo.net/bokunimowakaru/
 *******************************************************************************/
 
 #define I2C_lcd 0x3E							// LCD の I2C アドレス 
-#define PORT_SCL	0							// I2C SCLポート
-#define PORT_SDA	1							// I2C SDAポート
 #define	I2C_RAMDA	30							// I2C データシンボル長[us]
 #define GPIO_RETRY	50							// GPIO 切換え時のリトライ回数
 //	#define DEBUG								// デバッグモード
 #undef DEBUG
+
+byte PORT_SCL = 22;								// I2C SCLポート
+byte PORT_SDA = 21;								// I2C SDAポート
 
 unsigned long micros_prev;
 int ERROR_CHECK=1;								// 1:ACKを確認／0:ACKを無視する
@@ -294,8 +295,8 @@ void i2c_lcd_init(void){
 	byte data[2];
 	data[0]=0x00; data[1]=0x39; i2c_write(I2C_lcd,data,2);	// IS=1
 	data[0]=0x00; data[1]=0x11; i2c_write(I2C_lcd,data,2);	// OSC
-	data[0]=0x00; data[1]=0x70; i2c_write(I2C_lcd,data,2);	// コントラスト	0
-	data[0]=0x00; data[1]=0x56; i2c_write(I2C_lcd,data,2);	// Power/Cont	6
+	data[0]=0x00; data[1]=0x78; i2c_write(I2C_lcd,data,2);	// コントラスト	8
+	data[0]=0x00; data[1]=0x55; i2c_write(I2C_lcd,data,2);	// Power/Cont 5
 	data[0]=0x00; data[1]=0x6C; i2c_write(I2C_lcd,data,2);	// FollowerCtrl	C
 	delay(200);
 	data[0]=0x00; data[1]=0x38; i2c_write(I2C_lcd,data,2);	// IS=0
@@ -309,6 +310,14 @@ void i2c_lcd_init_xy(byte x, byte y){
 	#endif
 	if(x==16||x==8||x==20) _lcd_size_x=x;
 	if(y==1 ||y==2) _lcd_size_y=y;
+	i2c_lcd_init();
+}
+
+void i2c_lcd_init_xy_sdascl(byte x,byte y,byte sda,byte scl){
+	if(x==16||x==8||x==20) _lcd_size_x=x;
+	if(y==1 ||y==2) _lcd_size_y=y;
+	PORT_SCL = scl;
+	PORT_SDA = sda;
 	i2c_lcd_init();
 }
 
@@ -517,6 +526,14 @@ void lcdPrint(const char *s){
 	i2c_lcd_print(s);
 }
 
+void lcdPrint(String s){
+    char lcd[49];                               // 表示用変数を定義(49バイト48文字)
+    int len;                                    // 文字列長を示す整数型変数を定義
+    memset(lcd, 0, 49);                         // 文字列変数lcdの初期化(49バイト)
+	s.toCharArray(lcd, 49);
+	i2c_lcd_print(lcd);
+}
+
 void lcdPrint2(const char *s){
 	i2c_lcd_print2(s);
 }
@@ -535,6 +552,10 @@ void lcdPrintVal(const char *s,int in){
 
 void lcdPrintTime(unsigned long local){
 	i2c_lcd_print_time(local);
+}
+
+void lcdSetup(byte x, byte y, byte sda,byte scl){
+	i2c_lcd_init_xy_sdascl(x,y,sda,scl);
 }
 
 void lcdSetup(byte x, byte y){
