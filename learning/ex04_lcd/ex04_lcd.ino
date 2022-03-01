@@ -68,6 +68,7 @@ void loop(){                                    // 繰り返し実行する関�
     if(len==0)return;                           // 未受信のときはloop()の先頭に
     led(20,0,0);                                // (WS2812)LEDを赤色に変更
     udp.read(lcd, 48);                          // 受信データを文字列変数lcdへ
+    udp.flush();                                // 受信できなかったデータを破棄
     Serial.print(lcd);                          // シリアルへ出力する
     lcdPrint(lcd);                              // 液晶に表示する
     led(0,20,0);                                // (WS2812)LEDを緑色に戻す
