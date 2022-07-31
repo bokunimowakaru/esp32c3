@@ -18,6 +18,7 @@ SAVE_CSV = True             # CSVファイルの保存(True:保存,False:保存�
 DEV_CHECK = False           # 未登録デバイス保存(True:破棄,False:UNKNOWNで保存)
 ELEVATION = 0               # 標高(m) 気圧値の補正用
 HIST_BUF_N = 10             # 1センサ値あたりの履歴保持数
+DEVICE_MAX = 50             # 最大デバイス数(管理台数)
 
 # 補正用(表示のみ・保存データは補正されない)
 OFFSET_VALUE = {\
@@ -55,6 +56,7 @@ csvs = {\
     #'accem':[('Accelerometer X','g'),('Accelerometer Y','g'),('Accelerometer Z','g')],\
     'accem':[('Accelerometer X','m/s2'),('Accelerometer Y','m/s2'),('Accelerometer Z','m/s2')],\
     'actap':[('Power','W'),('Cumulative','Wh'),('Time','Seconds')],\
+    'count':[('Counter','')],\
     'meter':[('Power','W'),('Cumulative','Wh'),('Time','Seconds')],\
     'awsin':[('Participants',''),('Cumulative','')],\
     'xb_ac':[('Usage Time','h'),('Consumption','kWh'),('Prev. Usage Time','h'),('Consumption','kWh')],\
@@ -84,7 +86,7 @@ csvs_range = {\
     ('CO2','ppm'):              (0,2000),\
     ('CH4','ppm'):              (0,2000),\
     ('TVOC','ppb'):             (0,5000),\
-    ('Counter',''):             (0,10),\
+    ('Counter',''):             (0,30),\
     ('Fingers',''):             (0,5),\
     ('Accelerometer X','m/s2'): (-9.8,9.8),\
     ('Accelerometer Y','m/s2'): (-9.8,9.8),\
@@ -110,7 +112,7 @@ csvs_range = {\
 
 # センサ機器以外（文字データ入り）の登録デバイス
 notifyers = [\
-    'adash','atalk','cam_a','ir_in','sound',\
+    'adash','atalk','cam_a','ir_in','janke','sound',\
     'xb_ir','xbidt'\
 ]
 
@@ -205,7 +207,22 @@ def barChartHtml(colmun, range, val, color='lightgreen'):    # 棒グラフHTML�
 
 def wsgi_app(environ, start_response):              # HTTPアクセス受信時の処理
     path  = environ.get('PATH_INFO')                # リクエスト先のパスを代入
-    if (path[1:5] == 'log_') and (path[5:10] in sensors) and (path[12:16] == '.csv'):
+    # print('debug path:',path)                     ##確認用
+    if not path.isprintable():
+        start_response('404 Not Found',[])          # 404エラー設定
+        return ['404 Not Found'.encode()]           # 応答メッセージ(404)を返却
+
+    queries  = environ.get('QUERY_STRING')
+    if not queries.isprintable() or len(queries) > 256:
+        start_response('404 Not Found',[])          # 404エラー設定
+        return ['404 Not Found'.encode()]           # 応答メッセージ(404)を返却
+    if environ.get('REQUEST_METHOD') != 'GET':
+        return ['404 Not Found'.encode()]           # 応答メッセージ(404)を返却
+    print('debug queries:',queries)                 ##確認用
+    queries  = queries.lower().split('&')
+    # print('debug queries:',queries)               ## 確認用
+
+    if (len(path)==16) and (path[1:5] == 'log_') and (path[5:10] in sensors) and (path[12:16] == '.csv'):
         filename = 'log_' + path[5:12] + '.csv'
         try:
             fp = open(filename, 'rb')
@@ -221,11 +238,12 @@ def wsgi_app(environ, start_response):              # HTTPアクセス受信時�
     html = '<html>\n<head>\n'                       # HTMLコンテンツを作成
     html += '<meta http-equiv="refresh" content="10;">\n'   # 自動再読み込み
     html += '</head>\n<body>\n'                     # 以下は本文
-    html += '<h1>UDPセンサ用モニタ ('\
-          + str(len(devices)) + ' devices)</h1>\n'
-
-    queries  = environ.get('QUERY_STRING').lower().split('&')
-    # print('debug queries:',queries) ##確認用
+    html += '<h1>UDPセンサ用モニタ (<a href="/">'\
+          + str(len(devices));
+    if len(devices) == 1:
+        html += ' device</a>)</h1>\n'
+    else:
+        html += ' devices</a>)</h1>\n'
 
     sort_col = 'devices'
     filter_dev = list()
@@ -383,19 +401,24 @@ if argc >= 2:                                       # 入力パラメータ数�
         port = UDP_PORT                             # UDPポート番号を1024に
 else:
     port = UDP_PORT
-print('Listening UDP port', port, '...')            # ポート番号表示
-try:
-    sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)# ソケットを作成
-    sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)    # オプション
-    sock.bind(('', port))                           # ソケットに接続
-except Exception as e:                              # 例外処理発生時
-    print(e)                                        # エラー内容を表示
-    exit()                                          # プログラムの終了
+sock = None
+thread = None
 
-thread = threading.Thread(target=httpd, daemon=True)# スレッドhttpdの実体化
-thread.start()                                      # スレッドhttpdの起動
-
-while thread.is_alive and sock:                     # 永久ループ(httpd,udp動作中
+while True:
+    if not thread or not thread.is_alive():             # HTTPDが動作していないとき
+        print('Starting httpd', http_port, '...')       # ポート番号表示
+        thread = threading.Thread(target=httpd, daemon=True) # スレッドhttpdの実体化
+        thread.start()                                  # httpdの起動
+    if not sock:
+        print('Listening UDP port', port, '...')        # ポート番号表示
+        try:
+            sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)# ソケットを作成
+            sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)    # オプション
+            sock.bind(('', port))                       # ソケットに接続
+        except Exception as e:                          # 例外処理発生時
+            print(e)                                    # エラー内容を表示
+            delay(30)                                   # 連続再接続防止用の待ち時間
+            continue                                    # 再接続
     udp, udp_from = sock.recvfrom(buf_n)                # UDPパケットを取得
     try:
         udp = udp.decode()                              # UDPデータを文字列に変換
@@ -442,6 +465,9 @@ while thread.is_alive and sock:                     # 永久ループ(httpd,udp�
     filename = 'log_' + dev + '.csv'                    # ファイル名を作成
     if dev not in devices:
         print('NEW Device,',dev)
+        if len(devices) > DEVICE_MAX:                   # 管理可能台数を超過
+            print('over the limit, DEVICE_MAX,',devices)
+            continue                                    # whileに戻る
         devices.append(dev)
         # print(sorted(devices))
         if SAVE_CSV and not os.path.exists(filename):
