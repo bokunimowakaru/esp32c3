@@ -211,6 +211,9 @@ def wsgi_app(environ, start_response):              # HTTPアクセス受信時�
     if not path.isprintable():
         start_response('404 Not Found',[])          # 404エラー設定
         return ['404 Not Found'.encode()]           # 応答メッセージ(404)を返却
+    if path != '/' and (len(path)!=16 or path[1:5] != 'log_' or path[12:16] != '.csv'):
+        start_response('404 Not Found',[])          # 404エラー設定
+        return ['404 Not Found'.encode()]           # 応答メッセージ(404)を返却
 
     queries  = environ.get('QUERY_STRING')
     if not queries.isprintable() or len(queries) > 256:
@@ -221,8 +224,7 @@ def wsgi_app(environ, start_response):              # HTTPアクセス受信時�
     print('debug queries:',queries)                 ##確認用
     queries  = queries.lower().split('&')
     # print('debug queries:',queries)               ## 確認用
-
-    if (len(path)==16) and (path[1:5] == 'log_') and (path[5:10] in sensors) and (path[12:16] == '.csv'):
+    if path[5:10] in sensors:
         filename = 'log_' + path[5:12] + '.csv'
         try:
             fp = open(filename, 'rb')
