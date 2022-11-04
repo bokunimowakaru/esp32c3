@@ -5,7 +5,7 @@
 本ソースリストおよびソフトウェアは、ライセンスフリーです。
 個人での利用は自由に行えます。著作権表示の改変は禁止します。
 
-                               Copyright (c) 2012-2019 Wataru KUNINO
+                               Copyright (c) 2012-2022 Wataru KUNINO
                                https://bokunimo.net/bokunimowakaru/
 *********************************************************************/
 /*
@@ -16,13 +16,16 @@
 #define IR_OUT_ON	HIGH			// 赤外線LED発光時の出力値
 #define DATA_SIZE	16				// データ長(byte),4の倍数、16以上
 
-#define FLASH_AEHA_TIMES	17	// シンボルの搬送波点滅回数（ＡＥＨＡ）
-						//  16 -> 17 2022/1/30 ESP32C3 オーバヘッド!? 信号長10%短かかった
-#define FLASH_NEC_TIMES		23	// シンボルの搬送波点滅回数（ＮＥＣ）
-						//  22 -> 23 2022/1/30 ESP32C3 オーバヘッド!? 信号長5%短かかった
-#define FLASH_SIRC_TIMES	25	// シンボルの搬送波点滅回数（ＳＩＲＣ）
-						//  24 -> 25 2022/1/30 未確認だが同じ状況と考え、+1した
-#define FLASH_ON			11	// LED ON 期間 us (規格上 ON+OFFで 23 us)
+/*
+#define FLASH_AEHA_TIMES	16	// シンボルの搬送波点滅回数(AEHA)400us 
+#define FLASH_NEC_TIMES		25	// シンボルの搬送波点滅回数(NEC) 600us 22 -> 25 2022/10
+#define FLASH_SIRC_TIMES	26	// シンボルの搬送波点滅回数(SIRC)600us 24 -> 26 2022/10
+*/
+
+#define FLASH_AEHA_TIMES	17	// シンボルの搬送波点滅回数(AEHA) 16 -> 17 2022/1/30 ESP32C3
+#define FLASH_NEC_TIMES		23	// シンボルの搬送波点滅回数(NEC)  22 -> 23 2022/1/30 ESP32C3
+#define FLASH_SIRC_TIMES	25	// シンボルの搬送波点滅回数(SIRC) 24 -> 25 2022/1/30 未確認+1
+#define FLASH_ON			11	// LED ON 期間 us (規格上 ON+OFFで 23 us) -> 実測24us
 #define FLASH_OFF			11	// LED ON 期間 us (規格上 ON+OFFで 23 us)
 
 // enum IR_TYPE{ AEHA=0, NEC=1, SIRC=2 };		// 家製協AEHA、NEC、SONY SIRC切り換え
@@ -138,7 +141,7 @@ int ir_data2txt(char *txt, int txt_max, byte *data, int data_len){
 
 /* 赤外線ＬＥＤ信号送出 */
 void ir_send(byte *data, const byte data_len, const byte ir_type ){
-	byte i,j,t;
+	byte i,j,k,t;
 	byte b;
 	
 	if(data_len<16) return;
@@ -177,17 +180,18 @@ void ir_send(byte *data, const byte data_len, const byte ir_type ){
 					}
 					ir_wait( FLASH_SIRC_TIMES );
 				}
-				for( i = 8 ; i < (data_len/8+(data_len%8!=0)) ; i++){
-					for( b = 0 ; b < 8 ; b++ ){
-						if( data[i] & (0x01 << b) ){
-							ir_flash( 2 * FLASH_SIRC_TIMES );
-							t +=3 ;
-						}else{
-							ir_flash( FLASH_SIRC_TIMES );
-							t +=2 ;
-						}
-						ir_wait( FLASH_SIRC_TIMES );
+				// for( i = 8 ; i < (data_len/8+(data_len%8!=0)) ; i++){
+				for( k = 8 ; k < data_len ; k++){
+					i = k / 8;
+					b = k % 8;
+					if( data[i] & (0x01 << b) ){
+						ir_flash( 2 * FLASH_SIRC_TIMES );
+						t +=3 ;
+					}else{
+						ir_flash( FLASH_SIRC_TIMES );
+						t +=2 ;
 					}
+					ir_wait( FLASH_SIRC_TIMES );
 				}
 				while( t <= 75 ){
 					t++;
@@ -213,4 +217,32 @@ void ir_send(byte *data, const byte data_len, const byte ir_type ){
 			break;
 	}
     portEXIT_CRITICAL_ISR(&mutex);              // 割り込み許可
+}
+
+void ir_send(byte *data, const byte data_len, const byte ir_type, byte repeat){
+	if(ir_type == SIRC) repeat = (repeat+2)/3; // ÷=3 の切り上げ処理
+	if(repeat == 0) repeat = 1;
+	for(byte i=0;i<repeat;i++){
+		unsigned long t = millis();
+		ir_send(data, data_len, ir_type);
+		unsigned long dt = millis() - t;
+		unsigned long weight = 0;
+		if(i < repeat - 1){
+			switch( ir_type ){
+				case NEC:	
+					weight = 108 - dt;
+					break;
+				case SIRC:
+					weight = 45 - dt;
+					break;
+				case AEHA:
+				default:
+					weight = 130 - dt;
+				break;
+			}
+			if(weight > 80 ) weight = 80;
+			if(weight < 8 ) weight = 8;
+			delay(weight);
+		}
+	}
 }
