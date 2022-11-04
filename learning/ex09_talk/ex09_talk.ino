@@ -6,6 +6,8 @@ AquesTalkを使った音声合成でユーザへ気づきを通知すること�
     TXD -> AquesTalk側 RXD端子(2番ピン)
 
                                           Copyright (c) 2016-2019 Wataru KUNINO
+
+（参考文献）AquesTalk pico：https://www.a-quest.com/products/aquestalk_pico.html
 *******************************************************************************/
 
 #include <WiFi.h>                           // ESP32用WiFiライブラリ
