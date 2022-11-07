@@ -16,6 +16,10 @@ M5Stamp C3 or M5Stamp C3U + IR Unit に対応
 #define PIN_IR_OUT 1                        // IO1 に IR LEDを接続
 #define PIN_LED_RGB 2                       // IO2 に WS2812を接続(m5stamp)
 // #define PIN_LED_RGB 8                    // IO8 に WS2812を接続(DevKitM)
+
+#define PIN_BTN 3                           // IO3 にボタンを接続(m5stamp)
+// #define PIN_BTN 9                        // IO9 にボタンを接続(m5stampU)
+
 #define SSID "1234ABCD"                     // 無線LANアクセスポイントのSSID
 #define PASS "password"                     // パスワード
 #define PORT 1024                           // 送信のポート番号
@@ -28,13 +32,15 @@ IPAddress IP_BROAD;                         // ブロードキャストIPアド�
 
 WiFiUDP udp;                                // UDP通信用のインスタンスを定義
 WebServer server(80);                       // Webサーバ(ポート80=HTTP)定義
-byte D[DATA_LEN_MAX];                       // 保存用・リモコン信号データ
-int D_LEN;                                  // 保存用・リモコン信号長（bit）
+byte D[DATA_LEN_MAX]={0xAA,0x5A,0x8F,0x12,0x16,0xD1}; // リモコン信号データ
+int D_LEN=48;                               // 保存用・リモコン信号長（bit）
 int IR_TYPE=AEHA;                           // リモコン方式
+int ir_repeat = 3;                          // 送信リピート回数
 
 void handleRoot(){
     char s[97];                             // 文字列変数を定義 97バイト96文字
     Serial.println("Connected");            // 接続されたことをシリアル出力表示
+    led(63,0,0);                            // (WS2812)LEDを明るい赤色で点灯
     if(server.hasArg("TYPE")){              // 引数TYPEが含まれていた時
         IR_TYPE = server.arg("TYPE").toInt(); // 引数TYPEの値をIR_TYPEへ
     }
@@ -45,14 +51,16 @@ void handleRoot(){
         trUri2txt(s);
         Serial.println(s);
         D_LEN=ir_txt2data(D,DATA_LEN_MAX,s); // 受信データsをリモコン信号に変換
-        ir_send(D,D_LEN,IR_TYPE);
+        ir_send(D,D_LEN,IR_TYPE,ir_repeat);
     }
     ir_data2txt(s, 97, D, D_LEN);           // 信号データDを表示文字sに変換
     String tx = getHtml(s,D_LEN,IR_TYPE);   // HTMLコンテンツを取得
     server.send(200, "text/html", tx);      // HTMLコンテンツを送信
+    led(0,20,0);                            // (WS2812)LEDを緑色で点灯
 }
 
 void setup(){                               // 起動時に一度だけ実行する関数
+    pinMode(PIN_BTN,INPUT_PULLUP);          // ボタン入力の設定
     led_setup(PIN_LED_RGB);                 // WS2812の初期設定(ポート設定)
     ir_read_init(PIN_IR_IN);                // IRセンサの入力ポートの設定
     ir_send_init(PIN_IR_OUT);               // IR LEDの出力ポートの設定
@@ -93,12 +101,19 @@ void loop(){
         udp.println(s);                     // それを文字をUDP送信
         Serial.println(s);
         udp.endPacket();                    // UDP送信の終了(実際に送信する)
-        memcpy(D,d,DATA_LEN_MAX);           // データ変数dを変数Dにコピーする
         D_LEN=d_len;                        // データ長d_lenをD_LENにコピーする
+        IR_TYPE = ir_read_mode();           // リモコン方式を保持する
+        memcpy(D,d,DATA_LEN_MAX);           // データ変数dを変数Dにコピーする
         delay(500);
         led(0,20,0);                        // (WS2812)LEDを緑色で点灯
     }
-    /*
+    if(!digitalRead(PIN_BTN)){
+        led(63,0,0);                        // (WS2812)LEDを明るい赤色で点灯
+        ir_send(D,D_LEN,IR_TYPE,ir_repeat); // 送信
+        delay(500);                         // 0.5秒の待ち時間処理
+        led(0,20,0);                        // (WS2812)LEDを緑色で点灯
+    }
+    /* 部屋間の赤外線リモコン送信用
     d_len=udp.parsePacket();                // UDP受信長を変数d_lenに代入
     if(d_len==0)return;                     // TCPとUDPが未受信時にloop()先頭へ
     memset(s, 0, 97);                       // 文字列変数sの初期化(97バイト)
