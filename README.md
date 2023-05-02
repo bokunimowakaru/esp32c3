@@ -6,8 +6,15 @@ Example code for ESP32-C3, written for Arduino IDE
     最新版の保存先  
     - https://bokunimo.net/git/esp32c3/
     
-    ダウンロード方法(GitHubから)
+    ダウンロード方法(GitHubから)  
     - git clone https://bokunimo.net/git/esp32c3/
+
+## 解説書の無料ダウンロード
+
+本レポジトリ内のプログラムの解説書は、下記から無料でダウンロードできます。
+
+    解説書ダウンロード  
+    - https://bokunimo.net/esp32/esp32c3/
 
 ## 主なフォルダ名、プログラム名
 
