@@ -3,18 +3,18 @@ Example code for ESP32-C3, written for Arduino IDE
 
 ## 本コンテンツの最新版とダウンロード方法  
 
-    最新版の保存先  
-    - https://bokunimo.net/git/esp32c3/
+- 最新版の保存先  
+    [https://bokunimo.net/git/esp32c3/](https://bokunimo.net/git/esp32c3/)
     
-    ダウンロード方法(GitHubから)  
-    - git clone https://bokunimo.net/git/esp32c3/
+- ダウンロード方法(GitHubから)  
+    git clone https://bokunimo.net/git/esp32c3/
 
 ## 解説書の無料ダウンロード
 
 本レポジトリ内のプログラムの解説書は、下記から無料でダウンロードできます。
 
-    解説書ダウンロード  
-    - https://bokunimo.net/esp32/esp32c3/
+- 解説書ダウンロード  
+    [https://bokunimo.net/esp32/esp32c3](https://bokunimo.net/esp32/esp32c3) (PDF)
 
 ## 主なフォルダ名、プログラム名
 
@@ -45,13 +45,13 @@ Example code for ESP32-C3, written for Arduino IDE
 M5Stamp C3, M5Stamp C3U を使った 無線IO制御プログラミング学習用コンテンツです。  
 
 ## benchmark
-詳細＝ https://bokunimo.net/blog/esp/1491/
+詳細＝ [https://bokunimo.net/blog/esp/1491/](https://bokunimo.net/blog/esp/1491/)
 
 ## led_ws2812
-詳細＝ https://bokunimo.net/blog/esp/1522/
+詳細＝ [https://bokunimo.net/blog/esp/1522/](https://bokunimo.net/blog/esp/1522/)
 
 ## deepsleep
-詳細＝ https://bokunimo.net/blog/esp/1551/
+詳細＝ [https://bokunimo.net/blog/esp/1551/](https://bokunimo.net/blog/esp/1551/)
 
 ## Arduino IDE 用の ESP32 開発環境のセットアップ  
 
