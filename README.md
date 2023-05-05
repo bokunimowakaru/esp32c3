@@ -1,5 +1,5 @@
 # esp32c3
-Example code for ESP32-C3, written for Arduino IDE
+ESP32-C3 and M5Stamp C3/C3U Code Examples for I/O controled Wireless Communications
 
 ## 本コンテンツの最新版とダウンロード方法  
 
