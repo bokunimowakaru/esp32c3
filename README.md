@@ -6,7 +6,7 @@ Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and 
 ## 本コンテンツの最新版とダウンロード方法  
 
 - 最新版の保存先  
-    [https://bokunimo.net/git/esp32c3/](https://bokunimo.net/git/esp32c3/)
+    [https://bokunimo.net/git/esp32c3/archive/refs/heads/master.zip](https://bokunimo.net/git/esp32c3/archive/refs/heads/master.zip)    
     
 - ダウンロード方法(GitHubから)  
     git clone https://bokunimo.net/git/esp32c3/
@@ -21,7 +21,6 @@ Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and 
 ## 主なフォルダ名、プログラム名
 
 本レポジトリに収録した主なプログラムのフォルダ名、ファイル名の一覧を示します。  
-※ 「ex01_led」と「ex02_sw」は、M5Stamp C3/C3Uに実装されたLEDやボタン対応版です。
 
 |フォルダ名 プログラム名    |内容                                                                               |
 |---------------------------|-----------------------------------------------------------------------------------|
@@ -42,6 +41,8 @@ Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and 
 |benchmark                  |M5Stamp C3/C3U内蔵のESP32-C3マイコン処理能力を測定するのに使用したプログラム       |
 |deepsleep                  |乾電池による長期間駆動が可能なプログラムex02、03、04に使用したdeep sleep機能       |
 |led_ws2812                 |M5Stamp C3/C3U内蔵のLEDを制御するためのプログラム                                  |
+
+※ 「ex01_led_io」と「ex02_sw_io」はGPIO制御版、「ex01_led」と「ex02_sw」はM5Stamp C3/C3Uに実装されたLEDやボタン対応版、  
 
 ## learning  
 M5Stamp C3, M5Stamp C3U を使った 無線IO制御プログラミング学習用コンテンツです。  
@@ -67,16 +68,17 @@ M5Stamp C3, M5Stamp C3U を使った 無線IO制御プログラミング学習�
     - https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json  
 
     参考文献  
-    - https://github.com/espressif/arduino-esp32 (最新情報)  
-    - https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html (情報が古い場合があるので注意)  
+    - [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32) (最新情報)  
+    - [https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html) (情報が古い場合があるので注意)  
 
 3. [ツール]メニュー内の[ボード]からボードマネージャを開き、検索窓に「esp32」を入力後、esp32 by Espressif Systems をインストールする。  
 
 4. [ツール]メニュー内の[ボード]で ESP32C3 DEev Module を選択する。  
 
 by bokunimo.net(https://bokunimo.net/)  
-- ブログ (https://bokuniomo.net/blog/)  
-- カテゴリESP (https://bokunimo.net/blog/category/esp/)  
+- ブログ [https://bokuniomo.net/blog/](https://bokuniomo.net/blog/)  
+- ESP32のブログ [https://bokunimo.net/blog/category/esp/](https://bokunimo.net/blog/menu/esp/)  
+- ESP32のサイト [https://bokunimo.net/esp32/](https://bokunimo.net/esp32/)  
 
 ----------------------------------------------------------------
 
