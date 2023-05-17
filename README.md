@@ -1,6 +1,8 @@
 # esp32c3
 Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and M5Stamp C3/C3U 
 
+![ESP32-C3チップを開発したEspressif System純正の開発ボードESP32-C3-DevKitM-1](https://bokunimo.net/blog/wp-content/uploads/2021/06/DSC_0404.jpg)
+
 ## 本コンテンツの最新版とダウンロード方法  
 
 - 最新版の保存先  
