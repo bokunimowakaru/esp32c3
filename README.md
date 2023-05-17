@@ -81,8 +81,8 @@ by bokunimo.net(https://bokunimo.net/)
   [https://bokuniomo.net/blog/](https://bokuniomo.net/blog/)  
 - ボクにもわかる ESP32 のブログ  
   [https://bokunimo.net/blog/category/esp/](https://bokunimo.net/blog/menu/esp/)  
-- ボクにもわかる  
-  ESP32 [https://bokunimo.net/esp32/](https://bokunimo.net/esp32/)  
+- ボクにもわかる ESP32  
+  [https://bokunimo.net/esp32/](https://bokunimo.net/esp32/)  
 
 ----------------------------------------------------------------
 
