@@ -76,9 +76,13 @@ M5Stamp C3, M5Stamp C3U を使った 無線IO制御プログラミング学習�
 4. [ツール]メニュー内の[ボード]で ESP32C3 DEev Module を選択する。  
 
 by bokunimo.net(https://bokunimo.net/)  
-- ボクにもわかる電子工作のブログ [https://bokuniomo.net/blog/](https://bokuniomo.net/blog/)  
-- ボクにもわかる ESP32 のブログ [https://bokunimo.net/blog/category/esp/](https://bokunimo.net/blog/menu/esp/)  
-- ボクにもわかる ESP32 [https://bokunimo.net/esp32/](https://bokunimo.net/esp32/)  
+
+- ボクにもわかる電子工作のブログ  
+  [https://bokuniomo.net/blog/](https://bokuniomo.net/blog/)  
+- ボクにもわかる ESP32 のブログ  
+  [https://bokunimo.net/blog/category/esp/](https://bokunimo.net/blog/menu/esp/)  
+- ボクにもわかる  
+  ESP32 [https://bokunimo.net/esp32/](https://bokunimo.net/esp32/)  
 
 ----------------------------------------------------------------
 
