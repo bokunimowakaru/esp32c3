@@ -15,8 +15,8 @@ Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and 
 
 本レポジトリ内のプログラムの解説書は、下記から無料でダウンロードできます。
 
-- 解説書ダウンロード  
-    [https://bokunimo.net/esp32/esp32c3](https://bokunimo.net/esp32/esp32c3) (PDF)
+- 解説書(PDF版)ダウンロード  
+    [https://bokunimo.net/esp32/esp32c3](https://bokunimo.net/esp32/esp32c3)  
 
 ## 主なフォルダ名、プログラム名
 
