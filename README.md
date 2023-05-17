@@ -5,11 +5,11 @@ Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and 
 
 ## 本コンテンツの最新版とダウンロード方法  
 
-- 最新版の保存先  
+- 最新版のダウンロード(ZIP形式)  
     [https://bokunimo.net/git/esp32c3/archive/refs/heads/master.zip](https://bokunimo.net/git/esp32c3/archive/refs/heads/master.zip)    
     
-- ダウンロード方法(GitHubから)  
-    git clone https://bokunimo.net/git/esp32c3/
+- ダウンロード方法(gitコマンド)  
+    git clone https://bokunimo.net/git/esp32c3/  
 
 ## 解説書の無料ダウンロード
 
