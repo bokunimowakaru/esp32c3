@@ -3,22 +3,39 @@ Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and 
 
 ![ESP32-C3チップを開発したEspressif System純正の開発ボードESP32-C3-DevKitM-1](https://bokunimo.net/blog/wp-content/uploads/2021/06/DSC_0404.jpg)
 
-## 本コンテンツの最新版とダウンロード方法  
+## Git Repository esp32c3; 本コンテンツの最新版とダウンロード方法  
 
-- 最新版のダウンロード(ZIP形式)  
+- Recent ZIP; 最新版のダウンロード(ZIP形式)  
     [https://bokunimo.net/git/esp32c3/archive/refs/heads/master.zip](https://bokunimo.net/git/esp32c3/archive/refs/heads/master.zip)    
     
-- ダウンロード方法(gitコマンド)  
+- Git; ダウンロード方法(gitコマンド)  
     git clone https://bokunimo.net/git/esp32c3/  
 
-## 解説書の無料ダウンロード
+## M5Stamp C3/C3U; 解説書の無料ダウンロード
 
-本レポジトリ内のプログラムの解説書は、下記から無料でダウンロードできます。
+![Wireless-LCD](https://bokunimo.net/esp32/esp32c3/DSC_0803.jpg)
 
-- 解説書(PDF版)ダウンロード  
+M5Stamp C3/C3U を用いた無線による IO 制御プログラムについて説明する解説書を、無料で配布しています。  
+
+IoT Sensors; 作成するセンサ機器の一例
+![IoT-Sensors](https://bokunimo.net/esp32/esp32c3/sensors.jpg)  
+
+解説書は、下記から無料でダウンロードできます。
+
+- 解説書(PDF版)ダウンロード(in Japanese)  
     [https://bokunimo.net/esp32/esp32c3](https://bokunimo.net/esp32/esp32c3)  
 
-## 主なフォルダ名、プログラム名
+## ESP32C3 On Breadboard; ブレッドボードによる製作
+
+![Wireless-LCD](https://bokunimo.net/blog/wp-content/uploads/2023/08/IMG_20230811_0100wd.jpg)
+
+I wrote a blog about how to use ESP32-C3 on a breadboard.  
+ESP32-C3-WROOM-02 を ブレッドボード に実装し、サンプル・プログラムを動かす方法について、下記のブログで紹介しています。  
+
+- My Blog Page on bokunimo.net; IO制御対応IoT機器を手軽に製作! ESP32-C3-WROOM-02 をブレッドボードで動かす
+    [https://bokunimo.net/blog/esp/3949/](https://bokunimo.net/blog/esp/3949/)  
+
+## Contents; 主なフォルダ名、プログラム名
 
 本レポジトリに収録した主なプログラムのフォルダ名、ファイル名の一覧を示します。  
 
