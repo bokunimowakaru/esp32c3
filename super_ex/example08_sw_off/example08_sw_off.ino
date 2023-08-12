@@ -26,7 +26,7 @@ int reed;                                   // リードスイッチの状態用
 
 void setup(){                               // 起動時に一度だけ実行する関数
     pinMode(PIN_SW,INPUT_PULLUP);           // スイッチを接続したポートを入力に
-    Serial.begin(9600);                     // 動作確認のためのシリアル出力開始
+    Serial.begin(115200);                   // 動作確認のためのシリアル出力開始
     Serial.println("Example 08 REED SW");   // 「Example 08」をシリアル出力表示
     reed=digitalRead(PIN_SW);               // スイッチの状態を取得
 /*
