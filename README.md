@@ -1,7 +1,7 @@
 # esp32c3
 Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and M5Stamp C3/C3U 
 
-![ESP32-C3チップを開発したEspressif System純正の開発ボードESP32-C3-DevKitM-1](https://bokunimo.net/blog/wp-content/uploads/2021/06/DSC_0404.jpg)
+![ESP32-C3-DevKitM-1](https://bokunimo.net/blog/wp-content/uploads/2021/06/DSC_0404.jpg "Espressif System ESP32-C3-DevKitM-1")
 
 ## Git Repository esp32c3; 本コンテンツの最新版とダウンロード方法  
 
@@ -13,21 +13,22 @@ Arduino Code Examples of I/O controled Wireless Communications for ESP32-C3 and 
 
 ## M5Stamp C3/C3U; 解説書の無料ダウンロード
 
-![Wireless-LCD](https://bokunimo.net/esp32/esp32c3/DSC_0803.jpg)
+![Wireless-LCD](https://bokunimo.net/esp32/esp32c3/DSC_0803.jpg "M5Stamp C3 and LCD")  
 
+The figures below are examples of the wireless I/O sensor devices using M5Stamp C3/C3U.  
 M5Stamp C3/C3U を用いた無線による IO 制御プログラムについて説明する解説書を、無料で配布しています。  
 
-IoT Sensors; 作成するセンサ機器の一例
-![IoT-Sensors](https://bokunimo.net/esp32/esp32c3/sensors.jpg)  
+![IoT-Sensors](https://bokunimo.net/esp32/esp32c3/sensors.jpg "IoT Sensors; 作成するセンサ機器の一例")  
 
-解説書は、下記から無料でダウンロードできます。
+You can download the manual written in Japanese for free.  
+解説書(日本語・PDF版)は、下記から無料でダウンロードできます。
 
 - 解説書(PDF版)ダウンロード(in Japanese)  
     [https://bokunimo.net/esp32/esp32c3](https://bokunimo.net/esp32/esp32c3)  
 
 ## ESP32C3 On Breadboard; ブレッドボードによる製作
 
-![Wireless-LCD](https://bokunimo.net/blog/wp-content/uploads/2023/08/IMG_20230811_0100wd.jpg)
+![Wireless-LCD](https://bokunimo.net/blog/wp-content/uploads/2023/08/IMG_20230811_0100wd.jpg "Wireless LCD on Breadboard")
 
 I wrote a blog about how to use ESP32-C3 on a breadboard.  
 ESP32-C3-WROOM-02 を ブレッドボード に実装し、サンプル・プログラムを動かす方法について、下記のブログで紹介しています。  
@@ -58,20 +59,25 @@ ESP32-C3-WROOM-02 を ブレッドボード に実装し、サンプル・プロ
 |benchmark                  |M5Stamp C3/C3U内蔵のESP32-C3マイコン処理能力を測定するのに使用したプログラム       |
 |deepsleep                  |乾電池による長期間駆動が可能なプログラムex02、03、04に使用したdeep sleep機能       |
 |led_ws2812                 |M5Stamp C3/C3U内蔵のLEDを制御するためのプログラム                                  |
+|super_ex                   |書籍「超特急 Web接続 ESPマイコン・プログラム全集」の製作品を ESP32-C3 で動かします |
 
 ※ 「ex01_led_io」と「ex02_sw_io」はGPIO制御版、「ex01_led」と「ex02_sw」はM5Stamp C3/C3Uに実装されたLEDやボタン対応版、  
 
 ## learning  
 M5Stamp C3, M5Stamp C3U を使った 無線IO制御プログラミング学習用コンテンツです。  
 
-## benchmark
+## benchmark  
 詳細＝ [https://bokunimo.net/blog/esp/1491/](https://bokunimo.net/blog/esp/1491/)
 
-## led_ws2812
+## led_ws2812  
 詳細＝ [https://bokunimo.net/blog/esp/1522/](https://bokunimo.net/blog/esp/1522/)
 
-## deepsleep
+## deepsleep  
 詳細＝ [https://bokunimo.net/blog/esp/1551/](https://bokunimo.net/blog/esp/1551/)
+
+## super_ex  
+旧 ESP8266 や ESP32 を使って、ブレッドボード上で無線IO制御機器を製作する書籍「超特急 Web接続 ESPマイコン・プログラム全集」の製作品を ESP32-C3 で動かすためのプログラム集です。  
+書籍で紹介した 回路はそのままで、Wi-Fi モジュール部を ESP32-C3-WROOM-02 に置き換え、当フォルダ内のプログラムを書き込めば、書籍と(ほぼ)同様に動作します。  
 
 ## Arduino IDE 用の ESP32 開発環境のセットアップ  
 
