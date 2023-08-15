@@ -10,6 +10,12 @@ Example 0: ESP32C3 IOボード + RGB LED でGPIO制御 【RGB LED 対応版】
 #define PIN_LED_RGB 2                       // IO2にWS2812を接続(m5stamp用)
 // #define PIN_LED_RGB 8                    // IO8にWS2812(ピッチ変換基板用)
 
+/* for XIAO ESP32C3
+#define PIN_LED     D0
+#define PIN_SW      D1
+#define PIN_LED_RGB D2
+*/
+
 void setup(){                               // 起動時に一度だけ実行する関数
     pinMode(PIN_LED, OUTPUT);               // (通常の)LED用のIOポートを出力に
     pinMode(PIN_SW,INPUT_PULLUP);           // タクトスイッチ入力の設定
