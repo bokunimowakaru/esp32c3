@@ -1,10 +1,10 @@
 /*******************************************************************************
-Example 5: ESP32C3 (IoTセンサ) Wi-Fi 温湿度計 SENSIRION製 SHT31/SHT35 版
+Example 5: ESP32C3 (IoTセンサ) Wi-Fi 温湿度計 SENSIRION製 SHT40/SHT41 版
 デジタルI2Cインタフェース搭載センサから取得した温湿度を送信するIoTセンサです。
 
     ESP32 のI2Cポート:
-        SHT31/SHT35 SDAポート GPIO 1
-        SHT31/SHT35 SCLポート GPIO 0    設定方法＝shtSetup(SDA,SCL)
+        SHT40/SHT41 SDAポート GPIO 1
+        SHT40/SHT41 SCLポート GPIO 0    設定方法＝shtSetup(SDA,SCL)
 
 M5Stamp C3, M5Stamp C3U に対応
 
