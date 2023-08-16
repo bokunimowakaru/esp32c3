@@ -42,7 +42,7 @@ I wrote a blog about how to use XIAO ESP32C3 on a breadboard.
 This blog page below shows how to use ESP32-C3-WROOM-02 on a breadboard.  
 ESP32-C3-WROOM-02 を ブレッドボード に実装し、サンプル・プログラムを動かす方法について、下記のブログで紹介しています。  
 
-- My Blog Page on bokunimo.net; IO制御対応IoT機器を手軽に製作! ESP32-C3-WROOM-02 をブレッドボードで動かす
+- My Blog Page on bokunimo.net; IO制御対応IoT機器を手軽に製作! ESP32-C3-WROOM-02 をブレッドボードで動かす  
     [https://bokunimo.net/blog/esp/3949/](https://bokunimo.net/blog/esp/3949/)  
 
 ## Contents; 主なフォルダ名、プログラム名
