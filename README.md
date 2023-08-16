@@ -26,11 +26,20 @@ You can download the manual written in Japanese for free.
 - 解説書(PDF版)ダウンロード(in Japanese)  
     [https://bokunimo.net/esp32/esp32c3](https://bokunimo.net/esp32/esp32c3)  
 
-## ESP32C3 On Breadboard; ブレッドボードによる製作
+## XIAO ESP32C3 On Breadboard; XIAO ESP32C3 とブレッドボードによる製作
+
+I wrote a blog about how to use XIAO ESP32C3 on a breadboard.  
+
+![Wireless-LCD](https://bokunimo.net/blog/wp-content/uploads/2023/08/IMG_20230814_2230wd-1.jpg "XIAO ESP32C3 on Breadboard")
+
+- My Blog Page on bokunimo.net; Seeed Studio XIAO ESP32C3 をブレッドボードで動かす  
+    [https://bokunimo.net/blog/esp/4045/](https://bokunimo.net/blog/esp/4045/)  
+
+## ESP32C3 On Breadboard; ESP32-C3-WROOM-02 とブレッドボードによる製作
 
 ![Wireless-LCD](https://bokunimo.net/blog/wp-content/uploads/2023/08/IMG_20230811_0100wd.jpg "Wireless LCD on Breadboard")
 
-I wrote a blog about how to use ESP32-C3 on a breadboard.  
+This blog page below shows how to use ESP32-C3-WROOM-02 on a breadboard.  
 ESP32-C3-WROOM-02 を ブレッドボード に実装し、サンプル・プログラムを動かす方法について、下記のブログで紹介しています。  
 
 - My Blog Page on bokunimo.net; IO制御対応IoT機器を手軽に製作! ESP32-C3-WROOM-02 をブレッドボードで動かす
