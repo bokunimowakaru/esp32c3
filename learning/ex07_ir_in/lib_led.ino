@@ -1,11 +1,134 @@
 /***********************************************************************
 LED制御ドライバ RGB LED WS2812
-                                        Copyright (c) 2022 Wataru KUNINO
+                                   Copyright (c) 2022-2024 Wataru KUNINO
 ************************************************************************
 MITライセンスで配布します。権利表示の改変は禁止します。全て無保証です。
 本ソースコードには末尾に示すライセンス(The Unlicense)に基づいたコードを
 含みます。
 ***********************************************************************/
+
+#ifndef ESP_IDF_VERSION
+	#define ESP_IDF_VERSION 0
+	#define ESP_IDF_VERSION_VALUE 1
+#else
+	#define ESP_IDF_VERSION_VALUE ESP_IDF_VERSION_VAL(2, 0, 14)
+#endif
+
+#if ESP_IDF_VERSION > ESP_IDF_VERSION_VALUE
+
+rmt_data_t led_data[24];
+int _PIN_LED = 0;
+
+void led(int r,int g,int b){                    // LEDにカラーを設定
+    if(_PIN_LED == 0) return;
+    uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
+    for (int bit = 0; bit < 24; bit++) {
+        if ((rgb & (1 << (23 - bit))) ) {
+            led_data[bit].level0 = 1;
+            led_data[bit].duration0 = 8;
+            led_data[bit].level1 = 0;
+            led_data[bit].duration1 = 4;
+        } else {
+            led_data[bit].level0 = 1;
+            led_data[bit].duration0 = 4;
+            led_data[bit].level1 = 0;
+            led_data[bit].duration1 = 8;
+        }
+    }
+    rmtWrite(_PIN_LED, led_data, 24, RMT_WAIT_FOR_EVER);
+}
+
+void led(int brightness){                       // グレースケール制御
+    if(brightness > 0xff) brightness = 0xff;    // 256以上時に255に設定
+    led(brightness,brightness,brightness);      // RGB全て同値でLED制御
+}
+
+void led_on(){                                  // LED制御の停止
+    led(30);                                    // LEDの消灯
+}
+
+void led_off(){                                 // LED制御の停止
+    led(0);                                     // LEDの消灯
+}
+
+void led_setup(int pin){
+    _PIN_LED = pin;
+    rmtInit(_PIN_LED, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_1, 10000000);
+    // Serial.println("real tick set to: 100ns");
+}
+
+/***********************************************************************
+参考文献 RMT Write RGB LED
+Remote Control Transceiver (RMT) peripheral was designed to act as an
+infrared transceiver.
+https://docs.espressif.com/projects/arduino-esp32/en/latest/api/rmt.html
+************************************************************************
+
+// Copyright 2024 Espressif Systems (Shanghai) PTE LTD
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+ **
+ * @brief This example demonstrates usage of RGB LED driven by RMT
+ *
+ * The output is a visual WS2812 RGB LED color moving in a 8 x 4 LED matrix
+ * Parameters can be changed by the user. In a single LED circuit, it will just blink.
+ *
+
+void setup() {
+  Serial.begin(115200);
+  if (!rmtInit(BUILTIN_RGBLED_PIN, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_1, 10000000)) {
+    Serial.println("init sender failed\n");
+  }
+  Serial.println("real tick set to: 100ns");
+}
+
+int color[] = {0x55, 0x11, 0x77};  // Green Red Blue values
+int led_index = 0;
+
+void loop() {
+  // Init data with only one led ON
+  int led, col, bit;
+  int i = 0;
+  for (led = 0; led < NR_OF_LEDS; led++) {
+    for (col = 0; col < 3; col++) {
+      for (bit = 0; bit < 8; bit++) {
+        if ((color[col] & (1 << (7 - bit))) && (led == led_index)) {
+          led_data[i].level0 = 1;
+          led_data[i].duration0 = 8;
+          led_data[i].level1 = 0;
+          led_data[i].duration1 = 4;
+        } else {
+          led_data[i].level0 = 1;
+          led_data[i].duration0 = 4;
+          led_data[i].level1 = 0;
+          led_data[i].duration1 = 8;
+        }
+        i++;
+      }
+    }
+  }
+  // make the led travel in the panel
+  if ((++led_index) >= NR_OF_LEDS) {
+    led_index = 0;
+  }
+  // Send the data and wait until it is done
+  rmtWrite(BUILTIN_RGBLED_PIN, led_data, NR_OF_ALL_BITS, RMT_WAIT_FOR_EVER);
+  delay(100);
+}
+***********************************************************************/
+
+#else // ESP_IDF_VERSION <= 2.0.14
 
 #include "driver/rmt.h"
 
@@ -73,7 +196,7 @@ void setup_rmt_data_buffer(struct led_state new_state){
     }
 }
 
-/* 引数r,g,bに代入された色をLEDに送信する。値は0～255の範囲で設定 */
+// 引数r,g,bに代入された色をLEDに送信する。値は0～255の範囲で設定 //
 void led(int r,int g,int b){                    // LEDにカラーを設定
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
     struct led_state new_state;
@@ -105,6 +228,9 @@ void led_setup(int pin){
 void led_setup(){
     led_setup(_PIN_LED);
 }
+
+#endif
+
 
 /******************************************************************************
 lib_led.ino
