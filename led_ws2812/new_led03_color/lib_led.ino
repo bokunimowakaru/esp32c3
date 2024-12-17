@@ -15,11 +15,6 @@ MITライセンスで配布します。権利表示の改変は禁止します�
     // https://github.com/espressif/esp-idf/blob/master/components/esp_common/include/esp_idf_version.h
 #endif
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5,0,0)
-
-rmt_data_t led_data[24];
-int _PIN_LED = 0;
-
 void print_esp_idf_version(){
     Serial.print(ESP_IDF_VERSION >> 16);
     Serial.print(".");
@@ -27,6 +22,11 @@ void print_esp_idf_version(){
     Serial.print(".");
     Serial.println(ESP_IDF_VERSION % 255);
 }
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5,0,0)
+
+rmt_data_t led_data[24];
+int _PIN_LED = 0;
 
 void led(int r,int g,int b){                    // LEDにカラーを設定
     if(_PIN_LED == 0) return;
@@ -62,6 +62,7 @@ void led_off(){                                 // LED制御の停止
 
 void led_setup(int pin){
     _PIN_LED = pin;
+    if(_PIN_LED == 0) return;
     Serial.println("RMT Init, Espressif Systems Remote Control Transceiver, forked by Wataru KUNINO");
     Serial.print("RMT Init, ESP_IDF_VERSION: ");
     print_esp_idf_version();
@@ -210,6 +211,7 @@ void setup_rmt_data_buffer(struct led_state new_state){
 
 // 引数r,g,bに代入された色をLEDに送信する。値は0～255の範囲で設定 //
 void led(int r,int g,int b){                    // LEDにカラーを設定
+    if(_PIN_LED == 0) return;
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
     struct led_state new_state;
     new_state.leds[0] = rgb;
@@ -233,6 +235,7 @@ void led_off(){                                 // LED制御の停止
 
 void led_setup(int pin){
     _PIN_LED = pin;
+    if(_PIN_LED == 0) return;
     Serial.println("RMT Init, JSchaenzle/ESP32-NeoPixel-WS2812-RMT, forked by Wataru KUNINO");
     Serial.print("RMT Init, ESP_IDF_VERSION: ");
     print_esp_idf_version();
