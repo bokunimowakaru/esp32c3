@@ -8,16 +8,25 @@ MITライセンスで配布します。権利表示の改変は禁止します�
 ***********************************************************************/
 
 #ifndef ESP_IDF_VERSION
-	#define ESP_IDF_VERSION 0
-	#define ESP_IDF_VERSION_VALUE 1
-#else
-	#define ESP_IDF_VERSION_VALUE ESP_IDF_VERSION_VAL(2, 0, 14)
+    #define ESP_IDF_VERSION 0
+#endif
+#ifndef ESP_IDF_VERSION_VAL
+    #define ESP_IDF_VERSION_VAL(major, minor, patch) ((major << 16) | (minor << 8) | (patch))
+    // https://github.com/espressif/esp-idf/blob/master/components/esp_common/include/esp_idf_version.h
 #endif
 
-#if ESP_IDF_VERSION > ESP_IDF_VERSION_VALUE
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5,0,0)
 
 rmt_data_t led_data[24];
 int _PIN_LED = 0;
+
+void print_esp_idf_version(){
+    Serial.print(ESP_IDF_VERSION >> 16);
+    Serial.print(".");
+    Serial.print((ESP_IDF_VERSION >> 8) % 255);
+    Serial.print(".");
+    Serial.println(ESP_IDF_VERSION % 255);
+}
 
 void led(int r,int g,int b){                    // LEDにカラーを設定
     if(_PIN_LED == 0) return;
@@ -53,8 +62,11 @@ void led_off(){                                 // LED制御の停止
 
 void led_setup(int pin){
     _PIN_LED = pin;
+    Serial.println("RMT Init, Espressif Systems Remote Control Transceiver, forked by Wataru KUNINO");
+    Serial.print("RMT Init, ESP_IDF_VERSION: ");
+    print_esp_idf_version();
+    Serial.println("RMT Init, (PIN="+String(pin)+") real tick set to: 100ns");
     rmtInit(_PIN_LED, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_1, 10000000);
-    // Serial.println("real tick set to: 100ns");
 }
 
 /***********************************************************************
@@ -128,7 +140,7 @@ void loop() {
 }
 ***********************************************************************/
 
-#else // ESP_IDF_VERSION <= 2.0.14
+#else // ESP_IDF_VERSION < 5.0.0
 
 #include "driver/rmt.h"
 
@@ -221,6 +233,10 @@ void led_off(){                                 // LED制御の停止
 
 void led_setup(int pin){
     _PIN_LED = pin;
+    Serial.println("RMT Init, JSchaenzle/ESP32-NeoPixel-WS2812-RMT, forked by Wataru KUNINO");
+    Serial.print("RMT Init, ESP_IDF_VERSION: ");
+    print_esp_idf_version();
+    Serial.println("RMT Init, PIN="+String(pin));
     ws2812_control_init();
     led_off();
 }

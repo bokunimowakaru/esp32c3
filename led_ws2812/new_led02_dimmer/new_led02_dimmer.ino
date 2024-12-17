@@ -9,6 +9,8 @@ led02_dimmer RGB LED WS2812
 
 /* 初期化処理 */
 void setup() {                                  // 一度だけ実行する関数
+    Serial.begin(115200);
+    Serial.println("RGB LED WS2812");
     led_setup(PIN_LED);                         // LED接続ポートを出力に
 }
 
