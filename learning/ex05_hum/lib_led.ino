@@ -15,6 +15,8 @@ MITライセンスで配布します。権利表示の改変は禁止します�
     // https://github.com/espressif/esp-idf/blob/master/components/esp_common/include/esp_idf_version.h
 #endif
 
+#define NUM_LEDS 3                              // LED数 1～3に対応
+
 void print_esp_idf_version(){
     Serial.print(ESP_IDF_VERSION >> 16);
     Serial.print(".");
@@ -25,14 +27,14 @@ void print_esp_idf_version(){
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5,0,0)
 
-rmt_data_t led_data[24];
+rmt_data_t led_data[NUM_LEDS * 24];
 int _PIN_LED = 0;
 
 void led(int r,int g,int b){                    // LEDにカラーを設定
     if(_PIN_LED == 0) return;
     uint32_t rgb = (g & 0xff) << 16 | (r & 0xff) << 8 | (b & 0xff);
-    for (int bit = 0; bit < 24; bit++) {
-        if ((rgb & (1 << (23 - bit))) ) {
+    for (int bit = 0; bit < NUM_LEDS * 24; bit++) {
+        if ((rgb & (1 << (23 - (bit % 24)))) ) {
             led_data[bit].level0 = 1;
             led_data[bit].duration0 = 8;
             led_data[bit].level1 = 0;
@@ -44,7 +46,7 @@ void led(int r,int g,int b){                    // LEDにカラーを設定
             led_data[bit].duration1 = 8;
         }
     }
-    rmtWrite(_PIN_LED, led_data, 24, RMT_WAIT_FOR_EVER);
+    rmtWrite(_PIN_LED, led_data, NUM_LEDS * 24, RMT_WAIT_FOR_EVER);
 }
 
 void led(int brightness){                       // グレースケール制御
@@ -149,7 +151,6 @@ void loop() {
 #define LED_RMT_TX_CHANNEL  (rmt_channel_t)0
 int _PIN_LED = 8;
 
-#define NUM_LEDS 3
 #define BITS_PER_LED_CMD 24
 #define LED_BUFFER_ITEMS ((NUM_LEDS * BITS_PER_LED_CMD))
 
