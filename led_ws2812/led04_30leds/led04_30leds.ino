@@ -30,6 +30,7 @@ void setup(){                               // 起動時に一度だけ実行す
     Serial.println("RGB LED WS2812");
     pinMode(PIN_BTN,INPUT_PULLUP);          // ボタン入力の設定
     led_setup(PIN_LED_RGB);                 // RGB LED の初期設定(ポートを設定)
+    led_notify(1);                          // 起動をLEDで通知
     Serial.println("led=(20,40,10)");
     led(20,40,10);                          // RGB LEDを点灯 R=20, G=40, B=10
 }

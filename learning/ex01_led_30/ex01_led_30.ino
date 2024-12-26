@@ -108,10 +108,11 @@ void handleRoot(){
 }
 
 void setup(){                               // 起動時に一度だけ実行する関数
-    pinMode(PIN_BTN,INPUT_PULLUP);              // ボタン入力の設定
-    led_setup(PIN_LED_RGB);                 // RGB LED の初期設定(ポートを設定)
+    pinMode(PIN_BTN,INPUT_PULLUP);          // ボタン入力の設定
     Serial.begin(115200);                   // 動作確認用シリアル出力開始
     Serial.println("M5 LED HTTP");          // 「LED HTTP」をシリアル出力表示
+    led_setup(PIN_LED_RGB);                 // RGB LED の初期設定(ポートを設定)
+    led_notify(1);                          // 起動をLEDで通知
     WiFi.mode(WIFI_STA);                    // 無線LANをSTAモードに設定
     WiFi.begin(SSID,PASS);                  // 無線LANアクセスポイントへ接続
     while(WiFi.status() != WL_CONNECTED){   // 接続に成功するまで待つ
